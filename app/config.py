@@ -24,10 +24,10 @@ class Config:
     ELASTICSEARCH_USERNAME = os.getenv('ELASTICSEARCH_USERNAME', 'elastic')
     ELASTICSEARCH_PASSWORD = os.getenv('ELASTICSEARCH_PASSWORD', 'your-elasticsearch-password')
     
-    # Optional: Wazuh Configuration (for future integration)
-    WAZUH_API_URL = os.getenv('WAZUH_API_URL', 'http://localhost:55000')
-    WAZUH_API_USERNAME = os.getenv('WAZUH_API_USERNAME', 'wazuh')
-    WAZUH_API_PASSWORD = os.getenv('WAZUH_API_PASSWORD', 'your-wazuh-api-password')
+    # Wazuh Configuration (Docker instance)
+    WAZUH_API_URL = os.getenv('WAZUH_API_URL', 'https://localhost:55000')
+    WAZUH_API_USERNAME = os.getenv('WAZUH_API_USERNAME', 'wazuh-wui')
+    WAZUH_API_PASSWORD = os.getenv('WAZUH_API_PASSWORD', 'MyS3cr37P450r.*-')
     
     @classmethod
     def validate_credentials(cls):

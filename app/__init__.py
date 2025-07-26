@@ -5,6 +5,9 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+# Debug: Print environment variables
+print(f"DEBUG: SUPABASE_URL from env: {os.getenv('SUPABASE_URL')}")
+
 app = Flask(__name__)
 app.config.from_object('app.config') # Load configurations from config.py
 
