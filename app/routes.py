@@ -3,26 +3,31 @@ from app.telemetry import map_to_stride
 from app.utils import get_supabase_client, generate_synthetic_telemetry, load_sample_cicids2017_data
 from datetime import datetime
 from app.turest_score import calculate_trust_score
+from app.auth import require_auth
 
 bp = Blueprint('routes', __name__)
 
 @bp.route('/', methods=['GET'])
 def root():
-    """Main Endpoint - Trust Engine API welcome"""
+    """Root endpoint - Trust Engine API welcome"""
     return jsonify({
         'message': 'Trust Engine API is running!',
         'description': 'Adaptive, context-aware authentication for remote users',
         'endpoints': {
             'GET /': 'API information (this endpoint)',
-            'POST /telemetry': 'Ingest telemetry data and calculate trust score',
-            'GET /trust_score': 'Get trust score for a session (query param: session_id)',
-            'POST /generate_synthetic_telemetry': 'Generate and process synthetic telemetry data',
-            'POST /test_sample_data': 'Test with sample CICIDS2017 data'
+            'GET /auth/login': 'Okta login',
+            'GET /auth/logout': 'Okta logout',
+            'GET /auth/user': 'Get current user info',
+            'POST /telemetry': 'Ingest telemetry data and calculate trust score (protected)',
+            'GET /trust_score': 'Get trust score for a session (protected)',
+            'POST /generate_synthetic_telemetry': 'Generate and process synthetic telemetry data (protected)',
+            'POST /test_sample_data': 'Test with sample CICIDS2017 data (protected)'
         },
         'status': 'running'
     })
 
 @bp.route('/telemetry', methods=['POST'])
+@require_auth
 def ingest_telemetry():
     telemetry_data = request.get_json()
     stride_mapping = map_to_stride(telemetry_data)
@@ -50,6 +55,7 @@ def ingest_telemetry():
     return jsonify({'status': 'success'})
 
 @bp.route('/trust_score', methods=['GET'])
+@require_auth
 def get_trust_score():
     session_id = request.args.get('session_id')
     supabase = get_supabase_client()
@@ -64,6 +70,7 @@ def get_trust_score():
     return jsonify({'trust_score': trust_score, 'mfa_required': mfa_required})
 
 @bp.route('/generate_synthetic_telemetry', methods=['POST'])
+@require_auth
 def generate_and_process_telemetry():
     # Generate synthetic telemetry
     synthetic_data = generate_synthetic_telemetry()
@@ -93,15 +100,36 @@ def generate_and_process_telemetry():
     supabase.table('TrustScore').insert(trust_data).execute()
     return jsonify({'status': 'success', 'session_id': synthetic_data.get('session_id')})
 
-@bp.route('/test_sample_data', methods=['POST'])
+@bp.route('/test_sample_data', methods=['GET', 'POST'])
+@require_auth
 def test_sample_data():
     """Test endpoint using the sample CICIDS2017 JSON file"""
     # Load sample data
     sample_data = load_sample_cicids2017_data()
     if not sample_data:
         return jsonify({'error': 'Sample data file not found'}), 404
+    
     # Process the sample data
     stride_mapping = map_to_stride(sample_data)
+    
+    # For GET requests, just return the processed data without storing in Supabase
+    if request.method == 'GET':
+        trust_score, mfa_required = calculate_trust_score(
+            stride_mapping['risk_level'], 
+            stride_mapping['stride_category'], 
+            sample_data
+        )
+        return jsonify({
+            'status': 'success (GET - no Supabase storage)', 
+            'session_id': sample_data.get('session_id'),
+            'stride_category': stride_mapping['stride_category'],
+            'risk_level': stride_mapping['risk_level'],
+            'trust_score': trust_score,
+            'mfa_required': mfa_required,
+            'message': 'Use POST method to store data in Supabase'
+        })
+    
+    # For POST requests, store in Supabase
     supabase = get_supabase_client()
     # Store telemetry data
     telemetry_data = {
