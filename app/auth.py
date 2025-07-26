@@ -4,6 +4,9 @@ from functools import wraps
 import requests
 import json
 from app.config import Config
+from app.adaptive_mfa import adaptive_mfa, MFA_Level
+from app.turest_score import calculate_trust_score
+from app.telemetry import map_to_stride
 
 auth_bp = Blueprint('auth', __name__)
 login_manager = LoginManager()
@@ -219,6 +222,103 @@ def callback():
         })
     
     return jsonify({'error': 'Failed to get user info'}), 400
+
+@auth_bp.route('/mfa/check', methods=['POST'])
+@login_required
+def check_mfa_requirement():
+    """Check MFA requirements based on current session and telemetry"""
+    data = request.get_json()
+    telemetry_data = data.get('telemetry', {})
+    
+    # If no telemetry provided, use default values
+    if not telemetry_data:
+        telemetry_data = {
+            'session_id': f"session_{current_user.id}",
+            'vm_id': 'default',
+            'event_type': 'login_attempt'
+        }
+    
+    # Analyze telemetry with STRIDE
+    stride_mapping = map_to_stride(telemetry_data)
+    
+    # Calculate trust score
+    trust_score, _ = calculate_trust_score(
+        stride_mapping['risk_level'],
+        stride_mapping['stride_category'],
+        telemetry_data
+    )
+    
+    # Determine MFA requirements
+    mfa_requirement = adaptive_mfa.determine_mfa_requirement(
+        trust_score,
+        stride_mapping['stride_category'],
+        stride_mapping['risk_level']
+    )
+    
+    # Store MFA requirement in session for later validation
+    session['mfa_requirement'] = mfa_requirement
+    
+    return jsonify({
+        'mfa_requirement': mfa_requirement,
+        'telemetry_analysis': {
+            'stride_category': stride_mapping['stride_category'],
+            'risk_level': stride_mapping['risk_level'],
+            'trust_score': trust_score
+        }
+    })
+
+@auth_bp.route('/mfa/challenge', methods=['POST'])
+@login_required
+def get_mfa_challenge():
+    """Get MFA challenge based on required level"""
+    mfa_requirement = session.get('mfa_requirement')
+    
+    if not mfa_requirement:
+        return jsonify({'error': 'No MFA requirement found. Call /mfa/check first.'}), 400
+    
+    mfa_level = MFA_Level(mfa_requirement['mfa_level'])
+    challenge = adaptive_mfa.get_mfa_challenge(mfa_level, current_user.id)
+    
+    # Store challenge in session
+    session['mfa_challenge'] = challenge
+    
+    return jsonify({
+        'challenge': challenge,
+        'mfa_requirement': mfa_requirement
+    })
+
+@auth_bp.route('/mfa/verify', methods=['POST'])
+@login_required
+def verify_mfa():
+    """Verify MFA factors"""
+    data = request.get_json()
+    otp = data.get('otp')
+    device_fingerprint = data.get('device_fingerprint')
+    
+    mfa_requirement = session.get('mfa_requirement')
+    challenge = session.get('mfa_challenge')
+    
+    if not mfa_requirement or not challenge:
+        return jsonify({'error': 'No MFA challenge found. Call /mfa/challenge first.'}), 400
+    
+    # Verify OTP if required
+    if 'otp' in mfa_requirement['required_factors']:
+        if not otp or otp != challenge.get('otp'):
+            return jsonify({'error': 'Invalid OTP'}), 401
+    
+    # Verify device fingerprint if required
+    if 'device_fingerprint' in mfa_requirement['required_factors']:
+        if not device_fingerprint or not adaptive_mfa.validate_device_fingerprint(device_fingerprint, current_user.id):
+            return jsonify({'error': 'Invalid device fingerprint'}), 401
+    
+    # Mark MFA as completed
+    session['mfa_completed'] = True
+    
+    return jsonify({
+        'message': 'MFA verification successful',
+        'access_granted': mfa_requirement['access_granted'],
+        'mfa_level': mfa_requirement['mfa_level_name']
+    })
 
 @auth_bp.route('/logout')
 @login_required
