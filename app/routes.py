@@ -8,7 +8,7 @@ bp = Blueprint('routes', __name__)
 
 @bp.route('/', methods=['GET'])
 def root():
-    """Root endpoint - Trust Engine API welcome"""
+    """Main Endpoint - Trust Engine API welcome"""
     return jsonify({
         'message': 'Trust Engine API is running!',
         'description': 'Adaptive, context-aware authentication for remote users',
