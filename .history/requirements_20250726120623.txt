@@ -1,0 +1,9 @@
+Flask
+Flask-RESTful  # Or a similar framework for API creation
+SQLAlchemy      # Or another ORM for database interaction
+pandas          # For data manipulation
+scikit-learn    # For machine learning model (optional, for advanced scoring)
+python-dotenv   # For loading environment variables
+requests        # For API communication (Wazuh, Elasticsearch)
+elasticsearch    # Elasticsearch client library
+supabase-py
