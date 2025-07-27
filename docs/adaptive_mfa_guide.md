@@ -1,39 +1,39 @@
 # Adaptive MFA Guide
 
 ## Overview
-The Trust Engine implements **Adaptive Multi-Factor Authentication (MFA)** that dynamically adjusts authentication requirements based on real-time trust scores and STRIDE threat analysis.
+The Trust Engine implements Adaptive Multi-Factor Authentication (MFA) that dynamically adjusts authentication requirements based on real-time trust scores and STRIDE threat analysis.
 
-## 🎯 **How Adaptive MFA Works**
+## 🎯 How Adaptive MFA Works
 
-### **1. Trust Score Calculation**
-- **Base Trust Score**: Calculated from telemetry data (0-100)
-- **STRIDE Analysis**: Maps threats to security categories
-- **Adaptive Score**: Adjusted based on threat multipliers
+### 1. Trust Score Calculation
+- Base Trust Score: Calculated from telemetry data (0-100)
+- STRIDE Analysis: Maps threats to security categories
+- Adaptive Score: Adjusted based on threat multipliers
 
-### **2. MFA Levels**
-- **Level 1**: Password Only (High trust: 80-100)
-- **Level 2**: Password + OTP (Medium trust: 60-79)
-- **Level 3**: Password + OTP + Device Fingerprint (Low trust: 40-59)
-- **Level 4**: Access Blocked (Very low trust: 0-39)
+### 2. MFA Levels
+- Level 1: Password Only (High trust: 80-100)
+- Level 2: Password + OTP (Medium trust: 60-79)
+- Level 3: Password + OTP + Device Fingerprint (Low trust: 40-59)
+- Level 4: Access Blocked (Very low trust: 0-39)
 
-### **3. STRIDE Threat Multipliers**
-- **Spoofing**: 1.5x (Identity threats)
-- **Tampering**: 1.4x (Data integrity threats)
-- **Repudiation**: 1.3x (Logging/audit threats)
-- **Information Disclosure**: 1.2x (Data exposure threats)
-- **Denial of Service**: 1.1x (Availability threats)
-- **Elevation of Privilege**: 1.6x (Authorization threats - highest risk)
+### 3. STRIDE Threat Multipliers
+- Spoofing: 1.5x (Identity threats)
+- Tampering: 1.4x (Data integrity threats)
+- Repudiation: 1.3x (Logging/audit threats)
+- Information Disclosure: 1.2x (Data exposure threats)
+- Denial of Service: 1.1x (Availability threats)
+- Elevation of Privilege: 1.6x (Authorization threats - highest risk)
 
-## 🔄 **Authentication Flow**
+## 🔄 Authentication Flow
 
-### **Step 1: User Login**
-```bash
+### Step 1: User Login
+bash
 # User logs in via Okta
 GET /auth/login
-```
 
-### **Step 2: Check MFA Requirements**
-```bash
+
+### Step 2: Check MFA Requirements
+bash
 # Check what MFA is required based on current context
 POST /auth/mfa/check
 Content-Type: application/json
@@ -47,10 +47,10 @@ Content-Type: application/json
     "Total Fwd Packets": 45
   }
 }
-```
 
-**Response:**
-```json
+
+# Response
+json
 {
   "mfa_requirement": {
     "mfa_level": 2,
@@ -70,16 +70,16 @@ Content-Type: application/json
     "trust_score": 75
   }
 }
-```
 
-### **Step 3: Get MFA Challenge**
-```bash
+
+### Step 3: Get MFA Challenge
+bash
 # Get the specific MFA challenge
 POST /auth/mfa/challenge
-```
 
-**Response:**
-```json
+
+Response:
+json
 {
   "challenge": {
     "mfa_level": 2,
@@ -95,10 +95,10 @@ POST /auth/mfa/challenge
     "required_factors": ["password", "otp"]
   }
 }
-```
 
-### **Step 4: Verify MFA**
-```bash
+
+### Step 4: Verify MFA
+bash
 # Submit MFA factors
 POST /auth/mfa/verify
 Content-Type: application/json
@@ -107,21 +107,21 @@ Content-Type: application/json
   "otp": "123456",
   "device_fingerprint": "abc123def456"  // Only if required
 }
-```
 
-**Response:**
-```json
+
+Response:
+json
 {
   "message": "MFA verification successful",
   "access_granted": true,
   "mfa_level": "PASSWORD_OTP"
 }
-```
 
-## 📊 **MFA Decision Examples**
 
-### **Example 1: High Trust User**
-```json
+## 📊 MFA Decision Examples
+
+### Example 1: High Trust User
+json
 {
   "trust_score": 90,
   "stride_category": "Unknown",
@@ -129,10 +129,10 @@ Content-Type: application/json
   "mfa_level": "PASSWORD_ONLY",
   "reasoning": "High base trust score"
 }
-```
 
-### **Example 2: Medium Trust with Spoofing Threat**
-```json
+
+### Example 2: Medium Trust with Spoofing Threat
+json
 {
   "trust_score": 75,
   "stride_category": "Spoofing",
@@ -141,10 +141,10 @@ Content-Type: application/json
   "mfa_level": "PASSWORD_OTP",
   "reasoning": "Medium base trust score; STRIDE threat detected: Spoofing; Elevated risk level (3); Trust score reduced to 65 due to threats"
 }
-```
 
-### **Example 3: Low Trust with Elevation of Privilege**
-```json
+
+### Example 3: Low Trust with Elevation of Privilege
+json
 {
   "trust_score": 50,
   "stride_category": "Elevation of Privilege",
@@ -153,10 +153,10 @@ Content-Type: application/json
   "mfa_level": "PASSWORD_OTP_DEVICE",
   "reasoning": "Low base trust score; STRIDE threat detected: Elevation of Privilege; High risk level (5); Trust score reduced to 35 due to threats"
 }
-```
 
-### **Example 4: Very Low Trust - Blocked**
-```json
+
+### Example 4: Very Low Trust - Blocked
+json
 {
   "trust_score": 30,
   "stride_category": "Elevation of Privilege",
@@ -166,54 +166,54 @@ Content-Type: application/json
   "access_granted": false,
   "reasoning": "Very low base trust score; STRIDE threat detected: Elevation of Privilege; High risk level (5); Trust score reduced to 15 due to threats"
 }
-```
 
-## 🔧 **Integration with VM Agents**
 
-### **VM Agent Telemetry Flow**
-1. **VM Agent sends telemetry** → `/telemetry`
-2. **Trust Engine calculates** trust score and STRIDE analysis
-3. **MFA requirement determined** based on telemetry
-4. **User gets appropriate** authentication challenge
+## 🔧 Integration with VM Agents
 
-### **Real-time Adaptation**
-- **Normal behavior** → Password only
-- **Suspicious activity** → Password + OTP
-- **High-risk threats** → Password + OTP + Device fingerprint
-- **Critical threats** → Access blocked
+### VM Agent Telemetry Flow
+1. VM Agent sends telemetry → `/telemetry`
+2. Trust Engine calculates trust score and STRIDE analysis
+3. MFA requirement determined based on telemetry
+4. User gets appropriate authentication challenge
 
-## 🛡️ **Security Features**
+### Real-time Adaptation
+- Normal behavior → Password only
+- Suspicious activity → Password + OTP
+- High-risk threats → Password + OTP + Device fingerprint
+- Critical threats → Access blocked
 
-### **1. Dynamic Risk Assessment**
+## 🛡️ Security Features
+
+### 1. Dynamic Risk Assessment
 - Real-time telemetry analysis
 - STRIDE threat categorization
 - Adaptive trust scoring
 
-### **2. Multi-Factor Options**
-- **Password**: Standard authentication
-- **OTP**: Time-based one-time password
-- **Device Fingerprint**: Hardware/software fingerprinting
+### 2. Multi-Factor Options
+- Password: Standard authentication
+- OTP: Time-based one-time password
+- Device Fingerprint: Hardware/software fingerprinting
 
-### **3. Threat-Based Adjustments**
+### 3. Threat-Based Adjustments
 - STRIDE multipliers reduce trust scores
 - Risk levels add penalties
 - Automatic MFA escalation
 
-## 📋 **API Endpoints**
+## 📋 API Endpoints
 
-### **MFA Management**
+### MFA Management
 - `POST /auth/mfa/check` - Check MFA requirements
 - `POST /auth/mfa/challenge` - Get MFA challenge
 - `POST /auth/mfa/verify` - Verify MFA factors
 
-### **Telemetry Integration**
+### Telemetry Integration
 - `POST /telemetry` - Send telemetry (VM agents)
 - `GET /trust_score` - Get trust score for session
 
-## 🚀 **Usage Examples**
+## 🚀 Usage Examples
 
-### **Complete Authentication Flow**
-```bash
+### Complete Authentication Flow
+bash
 # 1. Login via Okta
 curl http://localhost:5001/auth/login
 
@@ -237,10 +237,10 @@ curl -X POST http://localhost:5001/auth/mfa/verify \
   -d '{
     "otp": "123456"
   }'
-```
 
-### **VM Agent Integration**
-```bash
+
+### VM Agent Integration
+bash
 # VM agent sends telemetry
 curl -X POST http://localhost:5001/telemetry \
   -H "Content-Type: application/json" \
@@ -251,16 +251,16 @@ curl -X POST http://localhost:5001/telemetry \
     "Flow Duration": 0.123,
     "Total Fwd Packets": 1000
   }'
-```
 
-## 🔍 **Monitoring and Analytics**
 
-### **Trust Score Tracking**
+## 🔍 Monitoring and Analytics
+
+### Trust Score Tracking
 - Monitor trust score changes over time
 - Track STRIDE threat patterns
 - Analyze MFA requirement distribution
 
-### **Security Metrics**
+### Security Metrics
 - Authentication success/failure rates
 - MFA level distribution
 - Threat detection accuracy

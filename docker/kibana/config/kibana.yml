@@ -1,0 +1,75 @@
+# Kibana configuration for Trust Engine
+server.name: trust-engine-kibana
+server.host: "0.0.0.0"
+server.port: 5601
+
+# HTTPS Configuration
+server.ssl.enabled: true
+server.ssl.key: /usr/share/kibana/config/ssl/private/kibana-key.pem
+server.ssl.certificate: /usr/share/kibana/config/ssl/certs/kibana-cert.pem
+
+# Elasticsearch connection
+elasticsearch.hosts: ["https://elasticsearch:9200"]
+elasticsearch.username: "elastic"
+elasticsearch.password: "trust-engine-elastic-password"
+elasticsearch.ssl.certificateAuthorities:
+  ["/usr/share/kibana/config/ssl/ca-cert.pem"]
+elasticsearch.ssl.verificationMode: certificate
+
+# Security settings
+xpack.security.enabled: true
+xpack.encryptedSavedObjects.encryptionKey: "trust-engine-kibana-encryption-key-32-chars"
+
+# Trust Engine specific settings
+server.basePath: ""
+server.rewriteBasePath: false
+
+# Logging
+logging.appenders:
+  file:
+    type: file
+    fileName: /usr/share/kibana/logs/kibana.log
+    layout:
+      type: json
+logging.root:
+  appenders:
+    - default
+    - file
+  level: info
+
+# Performance settings
+elasticsearch.requestTimeout: 30000
+elasticsearch.shardTimeout: 30000
+
+# Dashboard settings
+xpack.reporting.enabled: true
+xpack.canvas.enabled: true
+
+# Trust Engine Index Patterns (will be created via API)
+# - telemetrydata-*
+# - trustscore-*
+# - wazuh_alerts-*
+
+# Monitoring
+xpack.monitoring.ui.container.elasticsearch.enabled: true
+xpack.monitoring.ui.container.logstash.enabled: false
+
+# Maps (for geographical data if needed)
+xpack.maps.enabled: true
+
+# Machine Learning (for anomaly detection)
+xpack.ml.enabled: true
+
+# Advanced settings for Trust Engine
+newsfeed.enabled: false
+telemetry.enabled: false
+telemetry.optIn: false
+
+# Custom branding (optional)
+xpack.branding.logo: ""
+xpack.branding.faviconPNG: ""
+xpack.branding.faviconSVG: ""
+
+# Session settings
+xpack.security.session.idleTimeout: "8h"
+xpack.security.session.lifespan: "24h"

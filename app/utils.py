@@ -5,7 +5,11 @@ import uuid
 from datetime import datetime
 import json
 import os
+from elasticsearch import Elasticsearch
+import logging
 
+# Set up logging
+logger = logging.getLogger(__name__)
 
 def get_supabase_client() -> Client:
     url = Config.SUPABASE_URL
@@ -34,3 +38,87 @@ def load_sample_cicids2017_data():
     except FileNotFoundError:
         print(f"Sample data file not found at {file_path}")
         return None
+
+
+def get_elasticsearch_client():
+    """Get Elasticsearch client with enhanced HTTPS configuration"""
+    try:
+        # HTTPS configuration
+        ssl_config = {
+            'verify_certs': Config.ELASTICSEARCH_SSL_VERIFY,
+            'ssl_show_warn': False,
+            'request_timeout': 30,
+            'retry_on_timeout': True,
+            'max_retries': 3
+        }
+
+        # Add CA certificate if SSL verification is enabled
+        if Config.ELASTICSEARCH_SSL_VERIFY and hasattr(Config, 'ELASTICSEARCH_CA_CERT'):
+            ssl_config['ca_certs'] = Config.ELASTICSEARCH_CA_CERT
+
+        client = Elasticsearch(
+            Config.ELASTICSEARCH_URL,
+            http_auth=(Config.ELASTICSEARCH_USERNAME, Config.ELASTICSEARCH_PASSWORD),
+            **ssl_config
+        )
+
+        # Test connection
+        if client.ping():
+            logger.info(f"Elasticsearch client connected successfully to {Config.ELASTICSEARCH_URL}")
+        else:
+            logger.warning("Elasticsearch ping failed")
+
+        return client
+
+    except Exception as e:
+        logger.error(f"Failed to create Elasticsearch client: {str(e)}")
+        return None
+
+
+def index_to_elasticsearch(index_prefix: str, document: dict, es_client=None) -> bool:
+    """Helper function to index documents to Elasticsearch with time-based indexing"""
+    try:
+        if es_client is None:
+            es_client = get_elasticsearch_client()
+
+        if es_client is None:
+            return False
+
+        # Create time-based index name
+        date_str = datetime.utcnow().strftime("%Y-%m-%d")
+        index_name = f"{index_prefix}-{date_str}"
+
+        # Add @timestamp field for Kibana
+        document['@timestamp'] = document.get('timestamp', datetime.utcnow().isoformat())
+
+        response = es_client.index(
+            index=index_name,
+            body=document
+        )
+
+        logger.debug(f"Indexed document to {index_name}: {response['_id']}")
+        return True
+
+    except Exception as e:
+        logger.error(f"Failed to index to Elasticsearch: {str(e)}")
+        return False
+
+
+def search_elasticsearch(index_pattern: str, query: dict, size: int = 100) -> list:
+    """Helper function to search Elasticsearch indices"""
+    try:
+        es_client = get_elasticsearch_client()
+        if es_client is None:
+            return []
+
+        response = es_client.search(
+            index=index_pattern,
+            body=query,
+            size=size
+        )
+
+        return [hit['_source'] for hit in response['hits']['hits']]
+
+    except Exception as e:
+        logger.error(f"Elasticsearch search failed: {str(e)}")
+        return []

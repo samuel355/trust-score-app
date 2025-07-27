@@ -1,0 +1,58 @@
+# Elasticsearch configuration for Trust Engine
+cluster.name: trust-engine-cluster
+node.name: trust-engine-elasticsearch
+network.host: 0.0.0.0
+
+# Path settings
+path.data: /usr/share/elasticsearch/data
+path.logs: /usr/share/elasticsearch/logs
+
+# Memory settings
+bootstrap.memory_lock: true
+
+# Discovery settings
+discovery.type: single-node
+discovery.seed_hosts: ["127.0.0.1", "[::1]"]
+
+# Security settings
+xpack.security.enabled: true
+xpack.security.authc.api_key.enabled: true
+
+# HTTP SSL settings
+xpack.security.http.ssl.enabled: true
+xpack.security.http.ssl.key: /usr/share/elasticsearch/config/ssl/private/elasticsearch-key.pem
+xpack.security.http.ssl.certificate: /usr/share/elasticsearch/config/ssl/certs/elasticsearch-cert.pem
+xpack.security.http.ssl.certificate_authorities: /usr/share/elasticsearch/config/ssl/ca-cert.pem
+xpack.security.http.ssl.verification_mode: certificate
+xpack.security.http.ssl.client_authentication: optional
+
+# Transport SSL settings
+xpack.security.transport.ssl.enabled: true
+xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/ssl/private/elasticsearch-key.pem
+xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/ssl/certs/elasticsearch-cert.pem
+xpack.security.transport.ssl.certificate_authorities: /usr/share/elasticsearch/config/ssl/ca-cert.pem
+xpack.security.transport.ssl.verification_mode: certificate
+
+# Monitoring settings
+xpack.monitoring.collection.enabled: true
+
+# Index settings for Trust Engine
+action.auto_create_index: "+trust*,+telemetry*,+wazuh*,-*"
+
+# Performance settings
+indices.memory.index_buffer_size: 10%
+indices.memory.min_index_buffer_size: 48mb
+
+# Thread pool settings
+thread_pool.write.queue_size: 1000
+thread_pool.search.queue_size: 1000
+
+# Logging
+logger.org.elasticsearch.deprecation: WARN
+
+# Trust Engine specific settings
+# Index templates will be created via API
+cluster.routing.allocation.disk.threshold_enabled: true
+cluster.routing.allocation.disk.watermark.low: 85%
+cluster.routing.allocation.disk.watermark.high: 90%
+cluster.routing.allocation.disk.watermark.flood_stage: 95%

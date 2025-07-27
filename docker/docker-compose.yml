@@ -1,0 +1,234 @@
+version: "3.8"
+
+services:
+  # Elasticsearch
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.9
+    container_name: trust-engine-elasticsearch
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=trust-engine-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=trust-engine-elastic-password
+      - xpack.security.authc.api_key.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/ssl/elasticsearch-key.pem
+      - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/ssl/elasticsearch-cert.pem
+      - xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/ssl/ca-cert.pem
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/ssl/elasticsearch-key.pem
+      - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/ssl/elasticsearch-cert.pem
+      - xpack.security.transport.ssl.certificate_authorities=/usr/share/elasticsearch/config/ssl/ca-cert.pem
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - ./ssl/certs:/usr/share/elasticsearch/config/ssl/certs:ro
+      - ./ssl/private:/usr/share/elasticsearch/config/ssl/private:ro
+      - ./ssl/ca:/usr/share/elasticsearch/config/ssl:ro
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - trust-engine-network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -k -u elastic:trust-engine-elastic-password -f https://localhost:9200/_cluster/health || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Kibana
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.9
+    container_name: trust-engine-kibana
+    environment:
+      - SERVERNAME=kibana
+      - ELASTICSEARCH_HOSTS=https://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=trust-engine-elastic-password
+      - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=/usr/share/kibana/config/ssl/ca-cert.pem
+      - ELASTICSEARCH_SSL_VERIFICATIONMODE=certificate
+      - xpack.security.enabled=true
+      - xpack.encryptedSavedObjects.encryptionKey=trust-engine-kibana-encryption-key-32-chars
+      - SERVER_SSL_ENABLED=true
+      - SERVER_SSL_KEY=/usr/share/kibana/config/ssl/private/kibana-key.pem
+      - SERVER_SSL_CERTIFICATE=/usr/share/kibana/config/ssl/certs/kibana-cert.pem
+    volumes:
+      - kibana-data:/usr/share/kibana/data
+      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+      - ./ssl/certs:/usr/share/kibana/config/ssl/certs:ro
+      - ./ssl/private:/usr/share/kibana/config/ssl/private:ro
+      - ./ssl/ca:/usr/share/kibana/config/ssl:ro
+    ports:
+      - "5601:5601"
+    networks:
+      - trust-engine-network
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test:
+        ["CMD-SHELL", "curl -k -f https://localhost:5601/api/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Wazuh Manager
+  wazuh-manager:
+    image: wazuh/wazuh-manager:4.7.2
+    container_name: trust-engine-wazuh-manager
+    hostname: wazuh-manager
+    restart: always
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 655360
+        hard: 655360
+    environment:
+      - INDEXER_URL=https://wazuh-indexer:9200
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=SecretPassword
+      - FILEBEAT_SSL_VERIFICATION_MODE=full
+      - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/root-ca.pem
+      - SSL_CERTIFICATE=/etc/ssl/filebeat.pem
+      - SSL_KEY=/etc/ssl/filebeat.key
+      - API_USERNAME=wazuh-wui
+      - API_PASSWORD=MyS3cr37P450r.*-
+    volumes:
+      - wazuh-manager-config:/wazuh-config-mount
+      - wazuh-manager-logs:/var/log/wazuh
+      - wazuh-manager-etc:/etc/wazuh
+      - ./wazuh/config/wazuh-manager:/wazuh-config-mount/etc
+    ports:
+      - "1514:1514"
+      - "1515:1515"
+      - "514:514/udp"
+      - "55000:55000"
+    networks:
+      - trust-engine-network
+    depends_on:
+      - wazuh-indexer
+
+  # Wazuh Indexer (OpenSearch)
+  wazuh-indexer:
+    image: wazuh/wazuh-indexer:4.7.2
+    container_name: trust-engine-wazuh-indexer
+    hostname: wazuh-indexer
+    restart: always
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    environment:
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "bootstrap.memory_lock=true"
+      - "discovery.type=single-node"
+      - "network.host=0.0.0.0"
+      - "plugins.security.ssl.http.enabled=true"
+      - "plugins.security.nodedn_whitelist=CN=wazuh-indexer"
+    volumes:
+      - wazuh-indexer-data:/var/lib/wazuh-indexer
+      - ./wazuh/config/wazuh-indexer:/usr/share/wazuh-indexer/opensearch.yml:ro
+    ports:
+      - "9201:9200"
+    networks:
+      - trust-engine-network
+
+  # Wazuh Dashboard
+  wazuh-dashboard:
+    image: wazuh/wazuh-dashboard:4.7.2
+    container_name: trust-engine-wazuh-dashboard
+    hostname: wazuh-dashboard
+    restart: always
+    environment:
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=SecretPassword
+      - WAZUH_API_URL=https://wazuh-manager
+      - DASHBOARD_USERNAME=kibanaserver
+      - DASHBOARD_PASSWORD=kibanaserver
+      - API_USERNAME=wazuh-wui
+      - API_PASSWORD=MyS3cr37P450r.*-
+    volumes:
+      - ./wazuh/config/wazuh-dashboard/opensearch_dashboards.yml:/usr/share/wazuh-dashboard/config/opensearch_dashboards.yml:ro
+      - ./wazuh/config/wazuh-dashboard/wazuh.yml:/usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml:ro
+    ports:
+      - "5602:5601"
+    networks:
+      - trust-engine-network
+    depends_on:
+      - wazuh-indexer
+      - wazuh-manager
+
+  # Trust Engine Application
+  trust-engine-app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: trust-engine-app
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - FLASK_SSL_CERT=/app/docker/ssl/certs/trust-engine-cert.pem
+      - FLASK_SSL_KEY=/app/docker/ssl/private/trust-engine-key.pem
+      - ELASTICSEARCH_URL=https://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=trust-engine-elastic-password
+      - ELASTICSEARCH_SSL_VERIFY=false
+      - WAZUH_API_URL=https://wazuh-manager:55000
+      - WAZUH_API_USERNAME=wazuh-wui
+      - WAZUH_API_PASSWORD=MyS3cr37P450r.*-
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_API_KEY=${SUPABASE_API_KEY}
+      - OKTA_ISSUER=${OKTA_ISSUER}
+      - OKTA_CLIENT_ID=${OKTA_CLIENT_ID}
+      - OKTA_CLIENT_SECRET=${OKTA_CLIENT_SECRET}
+      - OKTA_REDIRECT_URI=https://localhost:5001/authorization-code/callback
+      - OKTA_AUDIENCE=${OKTA_AUDIENCE}
+    ports:
+      - "5001:5001"
+    volumes:
+      - ../:/app
+      - ./ssl/certs:/app/docker/ssl/certs:ro
+      - ./ssl/private:/app/docker/ssl/private:ro
+      - ./ssl/ca:/app/docker/ssl/ca:ro
+    networks:
+      - trust-engine-network
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      wazuh-manager:
+        condition: service_started
+    command: ["python", "run.py"]
+
+networks:
+  trust-engine-network:
+    driver: bridge
+
+volumes:
+  elasticsearch-data:
+    driver: local
+  kibana-data:
+    driver: local
+  wazuh-manager-config:
+    driver: local
+  wazuh-manager-logs:
+    driver: local
+  wazuh-manager-etc:
+    driver: local
+  wazuh-indexer-data:
+    driver: local

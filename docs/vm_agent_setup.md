@@ -3,73 +3,73 @@
 ## Overview
 This guide explains how to set up authentication for VM agents that will send telemetry data to your Trust Engine.
 
-## 🎯 **Authentication Strategy**
+## 🎯 Authentication Strategy
 
-### **Two Types of Authentication:**
+### Two Types of Authentication:
 
-1. **Regular Users** - Web browser login for security analysts
-2. **VM Agents** - Service accounts for automated telemetry ingestion
+1. Regular Users - Web browser login for security analysts
+2. VM Agents - Service accounts for automated telemetry ingestion
 
-## 🔧 **Setting Up VM Agent Credentials**
+## 🔧 Setting Up VM Agent Credentials
 
-### **Step 1: Create Service Accounts in Okta**
+### Step 1: Create Service Accounts in Okta
 
-1. **Log into Okta Admin Console**
-2. **Go to Directory** → **People**
-3. **Click "Add Person"**
-4. **Create service accounts for each VM:**
+1. Log into Okta Admin Console
+2. Go to Directory → People
+3. Click "Add Person"
+4. Create service accounts for each VM:
 
-#### **Example VM Agent Setup:**
-```
+#### Example VM Agent Setup:
+
 First Name: VM-Agent
 Last Name: 001
 Email: vm-agent-001@yourdomain.com
 Username: vm-agent-001
 Password: [Strong, unique password]
-```
 
-#### **Create Multiple Agents:**
+
+#### Create Multiple Agents:
 - `vm-agent-001@yourdomain.com` (for VM 1)
 - `vm-agent-002@yourdomain.com` (for VM 2)
 - `vm-agent-003@yourdomain.com` (for VM 3)
 
-### **Step 2: Assign VM Agents to Your Application**
+### Step 2: Assign VM Agents to Your Application
 
-1. **Go to Applications** → **Applications**
-2. **Click on your "Trust Engine API" application**
-3. **Go to "Assignments" tab**
-4. **Click "Assign"** → **"Assign to People"**
-5. **Select all your VM agents**
-6. **Set role to "User"**
+1. Go to Applications → Applications
+2. Click on your "Trust Engine API" application
+3. Go to "Assignments" tab
+4. Click "Assign" → "Assign to People"
+5. Select all your VM agents
+6. Set role to "User"
 
-### **Step 3: Configure VM Agent Permissions**
+### Step 3: Configure VM Agent Permissions
 
-1. **Go to Directory** → **People**
-2. **Click on a VM agent**
-3. **Go to "Applications" tab**
-4. **Ensure "Trust Engine API" is assigned**
-5. **Set appropriate permissions**
+1. Go to Directory → People
+2. Click on a VM agent
+3. Go to "Applications" tab
+4. Ensure "Trust Engine API" is assigned
+5. Set appropriate permissions
 
-## 🚀 **VM Agent Authentication Flow**
+## 🚀 VM Agent Authentication Flow
 
-### **1. VM Agent Login**
+### 1. VM Agent Login
 
 VM agents authenticate using the `/auth/vm-agent/login` endpoint:
 
-```bash
+bash
 curl -X POST http://localhost:5001/auth/vm-agent/login \
   -H "Content-Type: application/json" \
   -d '{
     "username": "vm-agent-001@yourdomain.com",
     "password": "your-vm-agent-password"
   }'
-```
 
-### **2. Send Telemetry Data**
+
+### 2. Send Telemetry Data
 
 After authentication, VM agents can send telemetry:
 
-```bash
+bash
 curl -X POST http://localhost:5001/telemetry \
   -H "Content-Type: application/json" \
   -H "Cookie: session=your-session-cookie" \
@@ -81,15 +81,15 @@ curl -X POST http://localhost:5001/telemetry \
     "Total Fwd Packets": 45,
     "Total Backward Packets": 23
   }'
-```
 
-## 📋 **VM Agent Configuration Examples**
 
-### **Wazuh Agent Integration**
+## 📋 VM Agent Configuration Examples
+
+### Wazuh Agent Integration
 
 In your Wazuh agent configuration, add custom rules to send data to Trust Engine:
 
-```xml
+xml
 <!-- Wazuh agent custom rule -->
 <rule id="100001" level="0">
   <if_sid>0</if_sid>
@@ -104,11 +104,11 @@ In your Wazuh agent configuration, add custom rules to send data to Trust Engine
   <expect>srcip</expect>
   <timeout_allowed>yes</timeout_allowed>
 </command>
-```
 
-### **Python Script for VM Agent**
 
-```python
+### Python Script for VM Agent
+
+python
 import requests
 import json
 import time
@@ -170,80 +170,80 @@ telemetry = {
 }
 
 result = agent.send_telemetry(telemetry)
-```
 
-## 🔐 **Security Best Practices**
 
-### **1. Password Management**
+## 🔐 Security Best Practices
+
+### 1. Password Management
 - ✅ Use strong, unique passwords for each VM agent
 - ✅ Store passwords securely (environment variables, vault)
 - ✅ Rotate passwords regularly
 - ❌ Never hardcode passwords in scripts
 
-### **2. Network Security**
+### 2. Network Security
 - ✅ Use HTTPS in production
 - ✅ Implement IP whitelisting if possible
 - ✅ Use VPN for secure communication
 - ❌ Don't expose Trust Engine on public internet
 
-### **3. Access Control**
+### 3. Access Control
 - ✅ Limit VM agent permissions to minimum required
 - ✅ Monitor agent access logs
 - ✅ Implement rate limiting
 - ❌ Don't give VM agents admin privileges
 
-## 📊 **Monitoring VM Agents**
+## 📊 Monitoring VM Agents
 
-### **Check Agent Status**
+### Check Agent Status
 
-```bash
+bash
 # Get current user info (for authenticated agents)
 curl http://localhost:5001/auth/user
 
 # Check VM agent specific endpoint
 curl http://localhost:5001/auth/vm-agent/protected
-```
 
-### **View Telemetry Data**
 
-```bash
+### View Telemetry Data
+
+bash
 # Get trust score for a session
 curl "http://localhost:5001/trust_score?session_id=session_123"
-```
 
-## 🚨 **Troubleshooting**
 
-### **Common Issues**
+## 🚨 Troubleshooting
 
-1. **"Authentication failed"**
+### Common Issues
+
+1. "Authentication failed"
    - Check VM agent credentials
    - Verify agent is assigned to application
    - Ensure agent account is active
 
-2. **"VM agent access required"**
+2. "VM agent access required"
    - Use VM agent login endpoint
    - Don't use regular user login for agents
 
-3. **"Invalid credentials"**
+3. "Invalid credentials"
    - Check username/password
    - Verify Okta configuration
    - Check network connectivity
 
-### **Debug Mode**
+### Debug Mode
 
 Enable debug mode to see detailed logs:
-```env
+env
 DEBUG=True
-```
 
-## 📈 **Scaling VM Agents**
 
-### **Multiple VMs**
+## 📈 Scaling VM Agents
+
+### Multiple VMs
 - Create unique service accounts for each VM
 - Use consistent naming convention
 - Monitor resource usage
 
-### **Load Balancing**
+### Load Balancing
 - Consider multiple Trust Engine instances
 - Implement proper session management
 - Use database for session storage in production

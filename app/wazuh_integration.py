@@ -12,26 +12,26 @@ logger = logging.getLogger(__name__)
 
 class WazuhIntegration:
     """Wazuh integration for real-time log collection and alert processing"""
-    
+
     def __init__(self):
         self.wazuh_url = Config.WAZUH_API_URL
         self.wazuh_username = Config.WAZUH_API_USERNAME
         self.wazuh_password = Config.WAZUH_API_PASSWORD
         self.session = requests.Session()
         self.auth_token = None
-        
+
     def authenticate(self) -> bool:
         """Authenticate with Wazuh API"""
         try:
             auth_url = f"{self.wazuh_url}/security/user/authenticate"
-            
+
             logger.info(f"Attempting Wazuh authentication with URL: {auth_url}")
             logger.info(f"Username: {self.wazuh_username}")
             logger.info(f"Password: {'*' * len(self.wazuh_password)}")
-            
+
             # Use Basic Authentication with GET request (not POST with JSON)
-            response = self.session.get(auth_url, auth=(self.wazuh_username, self.wazuh_password), verify=False)
-            
+            response = self.session.get(auth_url, auth=(self.wazuh_username, self.wazuh_password), verify=Config.WAZUH_SSL_VERIFY)
+
             if response.status_code == 200:
                 self.auth_token = response.json()['data']['token']
                 self.session.headers.update({
@@ -43,21 +43,21 @@ class WazuhIntegration:
                 logger.error(f"Wazuh authentication failed: {response.status_code}")
                 logger.error(f"Response: {response.text}")
                 return False
-                
+
         except Exception as e:
             logger.error(f"Wazuh authentication error: {str(e)}")
             return False
-    
+
     def get_agents(self) -> List[Dict]:
         """Get list of Wazuh agents"""
         try:
             if not self.auth_token:
                 if not self.authenticate():
                     return []
-            
+
             agents_url = f"{self.wazuh_url}/agents"
-            response = self.session.get(agents_url, verify=False)
-            
+            response = self.session.get(agents_url, verify=Config.WAZUH_SSL_VERIFY)
+
             if response.status_code == 200:
                 agents = response.json()['data']['affected_items']
                 logger.info(f"Retrieved {len(agents)} Wazuh agents")
@@ -65,29 +65,29 @@ class WazuhIntegration:
             else:
                 logger.error(f"Failed to get agents: {response.status_code}")
                 return []
-                
+
         except Exception as e:
             logger.error(f"Error getting agents: {str(e)}")
             return []
-    
+
     def get_alerts(self, agent_id: Optional[str] = None, limit: int = 100) -> List[Dict]:
         """Get recent alerts from Wazuh"""
         try:
             if not self.auth_token:
                 if not self.authenticate():
                     return []
-            
+
             alerts_url = f"{self.wazuh_url}/alerts"
             params = {
                 'limit': limit,
                 'sort': '-timestamp'
             }
-            
+
             if agent_id:
                 params['agents'] = agent_id
-            
-            response = self.session.get(alerts_url, params=params, verify=False)
-            
+
+            response = self.session.get(alerts_url, params=params, verify=Config.WAZUH_SSL_VERIFY)
+
             if response.status_code == 200:
                 alerts = response.json()['data']['affected_items']
                 logger.info(f"Retrieved {len(alerts)} alerts")
@@ -95,26 +95,26 @@ class WazuhIntegration:
             else:
                 logger.error(f"Failed to get alerts: {response.status_code}")
                 return []
-                
+
         except Exception as e:
             logger.error(f"Error getting alerts: {str(e)}")
             return []
-    
+
     def get_agent_logs(self, agent_id: str, limit: int = 100) -> List[Dict]:
         """Get logs from a specific agent"""
         try:
             if not self.auth_token:
                 if not self.authenticate():
                     return []
-            
+
             logs_url = f"{self.wazuh_url}/agents/{agent_id}/logs"
             params = {
                 'limit': limit,
                 'sort': '-timestamp'
             }
-            
-            response = self.session.get(logs_url, params=params, verify=False)
-            
+
+            response = self.session.get(logs_url, params=params, verify=Config.WAZUH_SSL_VERIFY)
+
             if response.status_code == 200:
                 logs = response.json()['data']['affected_items']
                 logger.info(f"Retrieved {len(logs)} logs from agent {agent_id}")
@@ -122,11 +122,11 @@ class WazuhIntegration:
             else:
                 logger.error(f"Failed to get logs for agent {agent_id}: {response.status_code}")
                 return []
-                
+
         except Exception as e:
             logger.error(f"Error getting logs for agent {agent_id}: {str(e)}")
             return []
-    
+
     def convert_wazuh_alert_to_telemetry(self, alert: Dict) -> Dict:
         """Convert Wazuh alert to Trust Engine telemetry format"""
         try:
@@ -149,27 +149,27 @@ class WazuhIntegration:
                 'wazuh_audit': alert.get('audit', {}),
                 'wazuh_mitre': alert.get('rule', {}).get('mitre', {})
             }
-            
+
             # Add CICIDS2017-style features based on alert content
             telemetry.update(self._extract_cicids_features(alert))
-            
+
             return telemetry
-            
+
         except Exception as e:
             logger.error(f"Error converting Wazuh alert to telemetry: {str(e)}")
             return {}
-    
+
     def _extract_cicids_features(self, alert: Dict) -> Dict:
         """Extract CICIDS2017-style features from Wazuh alert"""
         features = {}
-        
+
         try:
             # Extract network-related features from alert
             full_log = alert.get('full_log', '').lower()
-            
+
             # Flow Duration (simulated based on alert frequency)
             features['Flow Duration'] = 0.1  # Default value
-            
+
             # Packet counts (extracted from log patterns)
             if 'packet' in full_log:
                 features['Total Fwd Packets'] = 10
@@ -177,21 +177,21 @@ class WazuhIntegration:
             else:
                 features['Total Fwd Packets'] = 1
                 features['Total Backward Packets'] = 1
-            
+
             # Packet lengths
             features['Total Length of Fwd Packets'] = features['Total Fwd Packets'] * 64
             features['Total Length of Bwd Packets'] = features['Total Backward Packets'] * 64
-            
+
             # Flow rates
             features['Flow Bytes/s'] = 1000
             features['Flow Packets/s'] = 10
-            
+
             # IAT (Inter-Arrival Time) features
             features['Flow IAT Mean'] = 0.1
             features['Flow IAT Std'] = 0.05
             features['Flow IAT Max'] = 0.2
             features['Flow IAT Min'] = 0.01
-            
+
             # Flag counts (based on alert type)
             rule_level = alert.get('rule', {}).get('level', 0)
             if rule_level > 10:
@@ -200,11 +200,11 @@ class WazuhIntegration:
             else:
                 features['SYN Flag Count'] = 0
                 features['ACK Flag Count'] = 0
-            
+
             # Window sizes
             features['Init_Win_bytes_forward'] = 65535
             features['Init_Win_bytes_backward'] = 65535
-            
+
             # Add more features based on alert content
             if 'brute' in full_log or 'ssh' in full_log:
                 features['RST Flag Count'] = 1
@@ -212,7 +212,7 @@ class WazuhIntegration:
             else:
                 features['RST Flag Count'] = 0
                 features['PSH Flag Count'] = 0
-            
+
             # Fill remaining CICIDS2017 features with default values
             remaining_features = [
                 'Fwd Packet Length Max', 'Fwd Packet Length Min', 'Fwd Packet Length Mean',
@@ -232,46 +232,46 @@ class WazuhIntegration:
                 'Subflow Fwd Bytes', 'Subflow Bwd Packets', 'Subflow Bwd Bytes',
                 'act_data_pkt_fwd', 'min_seg_size_forward'
             ]
-            
+
             for feature in remaining_features:
                 if feature not in features:
                     features[feature] = 0
-            
+
         except Exception as e:
             logger.error(f"Error extracting CICIDS features: {str(e)}")
-        
+
         return features
-    
+
     def get_realtime_alerts(self, callback_func=None) -> None:
         """Get real-time alerts and process them"""
         try:
             if not self.auth_token:
                 if not self.authenticate():
                     return
-            
+
             # Get recent alerts
             alerts = self.get_alerts(limit=50)
-            
+
             for alert in alerts:
                 # Convert to telemetry format
                 telemetry = self.convert_wazuh_alert_to_telemetry(alert)
-                
+
                 if telemetry and callback_func:
                     # Send to Trust Engine via callback
                     callback_func(telemetry)
-                
+
                 logger.info(f"Processed Wazuh alert {alert.get('id')} for agent {alert.get('agent', {}).get('name')}")
-            
+
         except Exception as e:
             logger.error(f"Error in real-time alert processing: {str(e)}")
-    
+
     def test_connection(self) -> Dict:
         """Test Wazuh API connection"""
         try:
             if self.authenticate():
                 agents = self.get_agents()
                 alerts = self.get_alerts(limit=5)
-                
+
                 return {
                     'status': 'success',
                     'message': 'Wazuh connection successful',
@@ -285,7 +285,7 @@ class WazuhIntegration:
                     'message': 'Wazuh authentication failed',
                     'wazuh_url': self.wazuh_url
                 }
-                
+
         except Exception as e:
             return {
                 'status': 'error',
@@ -294,4 +294,4 @@ class WazuhIntegration:
             }
 
 # Global instance
-wazuh_integration = WazuhIntegration() 
+wazuh_integration = WazuhIntegration()
