@@ -27,9 +27,9 @@ services:
         soft: -1
         hard: -1
     volumes:
-          - elasticsearch-data:/usr/share/elasticsearch/data
-          - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
-          - ./docker/ssl:/usr/share/elasticsearch/config/ssl:ro
+      - elasticsearch-data:/usr/share/elasticsearch/data
+      - ./docker/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - ./docker/ssl:/usr/share/elasticsearch/config/ssl:ro
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -63,7 +63,7 @@ services:
       - SERVER_SSL_CERTIFICATE=/usr/share/kibana/config/ssl/certs/kibana-cert.pem
     volumes:
       - kibana-data:/usr/share/kibana/data
-      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+      - ./docker/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
       - ./docker/ssl:/usr/share/kibana/config/ssl:ro
     ports:
       - "5601:5601"
@@ -106,7 +106,7 @@ services:
       - wazuh-manager-config:/wazuh-config-mount
       - wazuh-manager-logs:/var/log/wazuh
       - wazuh-manager-etc:/etc/wazuh
-      - ./wazuh/config/wazuh-manager:/wazuh-config-mount/etc
+      - ./docker/wazuh/config/wazuh-manager:/wazuh-config-mount/etc
     ports:
       - "1514:1514"
       - "1515:1515"
@@ -139,7 +139,7 @@ services:
       - "plugins.security.nodedn_whitelist=CN=wazuh-indexer"
     volumes:
       - wazuh-indexer-data:/var/lib/wazuh-indexer
-      - ./wazuh/config/wazuh-indexer/opensearch.yml:/usr/share/wazuh-indexer/opensearch.yml:ro
+      - ./docker/wazuh/config/wazuh-indexer/opensearch.yml:/usr/share/wazuh-indexer/opensearch.yml:ro
     ports:
       - "9201:9200"
     networks:
@@ -160,8 +160,8 @@ services:
       - API_USERNAME=wazuh-wui
       - API_PASSWORD=MyS3cr37P450r.*-
     volumes:
-      - ./wazuh/config/wazuh-dashboard/opensearch_dashboards.yml:/usr/share/wazuh-dashboard/config/opensearch_dashboards.yml:ro
-      - ./wazuh/config/wazuh-dashboard/wazuh.yml:/usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml:ro
+      - ./docker/wazuh/config/wazuh-dashboard/opensearch_dashboards.yml:/usr/share/wazuh-dashboard/config/opensearch_dashboards.yml:ro
+      - ./docker/wazuh/config/wazuh-dashboard/wazuh.yml:/usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml:ro
     ports:
       - "5602:5601"
     networks:
@@ -173,7 +173,7 @@ services:
   # Trust Engine Application
   trust-engine-app:
     build:
-      context: ..
+      context: .
       dockerfile: docker/Dockerfile
     container_name: trust-engine-app
     environment:
@@ -198,10 +198,10 @@ services:
     ports:
       - "5001:5001"
     volumes:
-      - ../:/app
-      - ./ssl/certs:/app/docker/ssl/certs:ro
-      - ./ssl/private:/app/docker/ssl/private:ro
-      - ./ssl/ca:/app/docker/ssl/ca:ro
+      - ./:/app
+      - ./docker/ssl/certs:/app/docker/ssl/certs:ro
+      - ./docker/ssl/private:/app/docker/ssl/private:ro
+      - ./docker/ssl/ca:/app/docker/ssl/ca:ro
     networks:
       - trust-engine-network
     depends_on:
