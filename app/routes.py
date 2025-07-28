@@ -75,6 +75,14 @@ def root():
         'status': 'running'
     })
 
+@bp.route('/health', methods=['GET'])
+def health():
+    """Health check endpoint for Docker monitoring"""
+    return jsonify({
+        'status': 'healthy',
+        'message': 'Trust Engine is running'
+    })
+
 @bp.route('/telemetry', methods=['POST'])
 @require_vm_agent
 def ingest_telemetry():
