@@ -6,11 +6,12 @@ server.ssl.enabled: false
 # server.ssl.certificate: /usr/share/wazuh-dashboard/certs/dashboard.crt
 # server.ssl.key: /usr/share/wazuh-dashboard/certs/dashboard.key
 
-elasticsearch.hosts: [ "https://wazuh-indexer:9200" ]
+elasticsearch.hosts: ["https://wazuh-indexer:9200"]
 elasticsearch.username: "admin"
 elasticsearch.password: "SecretPassword"
 elasticsearch.ssl.verificationMode: "none"
-elasticsearch.ssl.certificateAuthorities: [ "/usr/share/wazuh-dashboard/certs/root-ca.pem" ]
+elasticsearch.ssl.certificateAuthorities:
+  ["/usr/share/wazuh-dashboard/certs/root-ca.pem"]
 # If using self-signed certs and want to ignore, use "none" above.
 
 logging.verbose: true
@@ -23,15 +24,4 @@ opensearch_security.cookie.secure: false
 # Session timeouts
 server.xsrf.disableProtection: false
 server.xsrf.whitelist: []
-
-# Wazuh App
-wazuh_app:
-  api_version: "4.7.2"
-  auth:
-    type: "basicauth"
-  hosts:
-    - https://wazuh-manager:55000
-  username: "wazuh-wui"
-  password: "MyS3cr37P450r.*-"
-  tls:
-    rejectUnauthorized: false
+# Wazuh App configuration removed - using wazuh.yml instead
