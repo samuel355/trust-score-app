@@ -1,0 +1,13 @@
+[ v3_req ]
+subjectAltName = @alt_names
+
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+
+[alt_names]
+DNS.1=elasticsearch
+DNS.2=localhost
+DNS.3=trust-engine-elasticsearch
+IP.1=127.0.0.1
+IP.2=::1
