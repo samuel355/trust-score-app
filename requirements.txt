@@ -7,5 +7,4 @@ python-dotenv   # For loading environment variables
 requests        # For API communication (Wazuh, Elasticsearch)
 elasticsearch    # Elasticsearch client library
 supabase
-flask-okta      # Okta Flask integration
 flask-login      # User session management

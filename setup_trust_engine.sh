@@ -231,16 +231,6 @@ wait_for_services() {
     done
     echo ""
     print_status "Kibana is ready."
-</out_text>
-
-<old_text line=230>
-        # Import dashboards using curl
-        curl -X POST "localhost:5601/api/saved_objects/_import" \
-             -H "kbn-xsrf: true" \
-             -H "Content-Type: application/json" \
-             --form file=@"$KIBANA_DIR/trust_engine_dashboards.json" \
-             --user elastic:trust-engine-elastic-password
-
     # Wait for Wazuh Manager
     print_status "Waiting for Wazuh Manager..."
     counter=0
@@ -266,9 +256,10 @@ import_kibana_dashboards() {
         sleep 30
 
         # Import dashboards using curl
-        curl -X POST "localhost:5601/api/saved_objects/_import" \
+        curl -X POST "https://localhost:5601/api/saved_objects/_import" \
              -H "kbn-xsrf: true" \
              -H "Content-Type: application/json" \
+             -k \
              --form file=@"$KIBANA_DIR/trust_engine_dashboards.json" \
              --user elastic:trust-engine-elastic-password
 

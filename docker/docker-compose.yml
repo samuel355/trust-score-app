@@ -15,23 +15,21 @@ services:
       - ELASTIC_PASSWORD=trust-engine-elastic-password
       - xpack.security.authc.api_key.enabled=true
       - xpack.security.http.ssl.enabled=true
-      - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/ssl/elasticsearch-key.pem
-      - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/ssl/elasticsearch-cert.pem
-      - xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/ssl/ca-cert.pem
+      - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/ssl/private/elasticsearch-key.pem
+      - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/ssl/certs/elasticsearch-cert.pem
+      - xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/ssl/ca/ca-cert.pem
       - xpack.security.transport.ssl.enabled=true
-      - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/ssl/elasticsearch-key.pem
-      - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/ssl/elasticsearch-cert.pem
-      - xpack.security.transport.ssl.certificate_authorities=/usr/share/elasticsearch/config/ssl/ca-cert.pem
+      - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/ssl/private/elasticsearch-key.pem
+      - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/ssl/certs/elasticsearch-cert.pem
+      - xpack.security.transport.ssl.certificate_authorities=/usr/share/elasticsearch/config/ssl/ca/ca-cert.pem
     ulimits:
       memlock:
         soft: -1
         hard: -1
     volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
-      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
-      - ./ssl/certs:/usr/share/elasticsearch/config/ssl/certs:ro
-      - ./ssl/private:/usr/share/elasticsearch/config/ssl/private:ro
-      - ./ssl/ca:/usr/share/elasticsearch/config/ssl:ro
+          - elasticsearch-data:/usr/share/elasticsearch/data
+          - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+          - ./docker/ssl:/usr/share/elasticsearch/config/ssl:ro
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -56,7 +54,7 @@ services:
       - ELASTICSEARCH_HOSTS=https://elasticsearch:9200
       - ELASTICSEARCH_USERNAME=elastic
       - ELASTICSEARCH_PASSWORD=trust-engine-elastic-password
-      - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=/usr/share/kibana/config/ssl/ca-cert.pem
+      - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=/usr/share/kibana/config/ssl/ca/ca-cert.pem
       - ELASTICSEARCH_SSL_VERIFICATIONMODE=certificate
       - xpack.security.enabled=true
       - xpack.encryptedSavedObjects.encryptionKey=trust-engine-kibana-encryption-key-32-chars
@@ -66,9 +64,7 @@ services:
     volumes:
       - kibana-data:/usr/share/kibana/data
       - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
-      - ./ssl/certs:/usr/share/kibana/config/ssl/certs:ro
-      - ./ssl/private:/usr/share/kibana/config/ssl/private:ro
-      - ./ssl/ca:/usr/share/kibana/config/ssl:ro
+      - ./docker/ssl:/usr/share/kibana/config/ssl:ro
     ports:
       - "5601:5601"
     networks:
@@ -143,7 +139,7 @@ services:
       - "plugins.security.nodedn_whitelist=CN=wazuh-indexer"
     volumes:
       - wazuh-indexer-data:/var/lib/wazuh-indexer
-      - ./wazuh/config/wazuh-indexer:/usr/share/wazuh-indexer/opensearch.yml:ro
+      - ./wazuh/config/wazuh-indexer/opensearch.yml:/usr/share/wazuh-indexer/opensearch.yml:ro
     ports:
       - "9201:9200"
     networks:

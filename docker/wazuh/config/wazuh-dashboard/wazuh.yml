@@ -1,0 +1,28 @@
+wazuh:
+  api:
+    url: https://wazuh-manager
+    port: 55000
+    username: wazuh-wui
+    password: MyS3cr37P450r.*-
+    insecure: true
+    timeout: 30
+    retry: 5
+    interval: 10
+
+  indexer:
+    url: https://wazuh-indexer:9200
+    username: admin
+    password: SecretPassword
+    ssl:
+      ca: /usr/share/wazuh-dashboard/certs/root-ca.pem
+      verify: false
+
+  dashboard:
+    user: "kibanaserver"
+    password: "kibanaserver"
+    host: "0.0.0.0"
+    port: 5601
+    ssl:
+      enabled: false
+      cert: ""
+      key: ""
