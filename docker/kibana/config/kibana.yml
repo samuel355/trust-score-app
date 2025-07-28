@@ -1,9 +1,9 @@
-# Kibana configuration for Trust Engine
+# Kibana configuration for Trust Engine - Minimal Setup
 server.name: trust-engine-kibana
 server.host: "0.0.0.0"
 server.port: 5601
 
-# HTTPS Configuration
+# Disable SSL for simplicity
 server.ssl.enabled: false
 
 # Elasticsearch connection
@@ -16,50 +16,29 @@ elasticsearch.ssl.verificationMode: none
 xpack.security.enabled: true
 xpack.encryptedSavedObjects.encryptionKey: "trust-engine-kibana-encryption-key-32-chars"
 
-# Trust Engine specific settings
+# Basic settings
 server.rewriteBasePath: false
 
-# Logging
-logging.appenders:
-  file:
-    type: file
-    fileName: /usr/share/kibana/logs/kibana.log
-    layout:
-      type: json
+# Logging - simple console logging
 logging.root:
-  appenders:
-    - default
-    - file
   level: info
 
 # Performance settings
 elasticsearch.requestTimeout: 30000
 elasticsearch.shardTimeout: 30000
 
-# Dashboard settings
-xpack.reporting.enabled: true
-
-# Trust Engine Index Patterns (will be created via API)
-# - telemetrydata-*
-# - trustscore-*
-# - wazuh_alerts-*
+# Enable basic features
+xpack.reporting.enabled: false
+xpack.maps.enabled: true
+xpack.ml.enabled: true
 
 # Monitoring
 xpack.monitoring.ui.container.elasticsearch.enabled: true
-xpack.monitoring.ui.container.logstash.enabled: false
 
-# Maps (for geographical data if needed)
-xpack.maps.enabled: true
-
-# Machine Learning (for anomaly detection)
-xpack.ml.enabled: true
-
-# Advanced settings for Trust Engine
+# Disable telemetry and news
 newsfeed.enabled: false
 telemetry.enabled: false
 telemetry.optIn: false
-
-# Custom branding removed - not supported in this version
 
 # Session settings
 xpack.security.session.idleTimeout: "8h"
