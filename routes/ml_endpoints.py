@@ -17,10 +17,7 @@ import traceback
 import io
 import base64
 
-# Import Trust Engine ML modules
-from app.ml_engine import TrustScoreMLEngine
-from app.evaluation import TrustEngineEvaluator
-from app.visualization import TrustEngineVisualizer
+# Import Trust Engine ML modules - using lazy imports to avoid circular dependency
 from app.utils import get_supabase_client, get_elasticsearch_client, load_sample_cicids2017_data
 from app.auth import require_auth
 
@@ -32,10 +29,34 @@ logger = logging.getLogger(__name__)
 ml_bp = Blueprint('ml_api', __name__, url_prefix='/api/ml')
 api = Api(ml_bp)
 
-# Global ML engine instance
-ml_engine = TrustScoreMLEngine()
-evaluator = TrustEngineEvaluator()
-visualizer = TrustEngineVisualizer()
+# Global ML engine instances - lazy initialization to avoid circular imports
+ml_engine = None
+evaluator = None
+visualizer = None
+
+def get_ml_engine():
+    """Lazy initialization of ML engine"""
+    global ml_engine
+    if ml_engine is None:
+        from app.ml_engine import TrustScoreMLEngine
+        ml_engine = TrustScoreMLEngine()
+    return ml_engine
+
+def get_evaluator():
+    """Lazy initialization of evaluator"""
+    global evaluator
+    if evaluator is None:
+        from app.evaluation import TrustEngineEvaluator
+        evaluator = TrustEngineEvaluator()
+    return evaluator
+
+def get_visualizer():
+    """Lazy initialization of visualizer"""
+    global visualizer
+    if visualizer is None:
+        from app.visualization import TrustEngineVisualizer
+        visualizer = TrustEngineVisualizer()
+    return visualizer
 
 class MLHealthCheck(Resource):
     """Health check endpoint for ML services"""
@@ -47,8 +68,8 @@ class MLHealthCheck(Resource):
                 "status": "healthy",
                 "timestamp": datetime.utcnow().isoformat(),
                 "ml_engine": "initialized",
-                "classifiers_available": list(ml_engine.classifiers.keys()),
-                "models_trained": len(ml_engine.trained_models) > 0,
+                "classifiers_available": list(get_ml_engine().classifiers.keys()),
+                "models_trained": len(get_ml_engine().trained_models) > 0,
                 "version": "1.0.0"
             }, 200
         except Exception as e:
@@ -90,7 +111,7 @@ class TrainingResource(Resource):
                 return {"error": "No training data available"}, 400
 
             # Train all classifiers
-            training_results = ml_engine.train_all_classifiers(
+            training_results = get_ml_engine().train_all_classifiers(
                 df,
                 test_size=config["test_size"],
                 cross_validate=config["cross_validation"],
@@ -99,7 +120,7 @@ class TrainingResource(Resource):
 
             # Save models if requested
             if config["save_models"]:
-                model_paths = ml_engine.save_models(config["model_path"])
+                model_paths = get_ml_engine().save_models(config["model_path"])
                 training_results["model_paths"] = model_paths
 
             # Log training completion
@@ -134,15 +155,15 @@ class PredictionResource(Resource):
             classifier_name = data.get('classifier', 'RandomForest')
 
             # Validate classifier
-            if classifier_name not in ml_engine.trained_models:
-                available = list(ml_engine.trained_models.keys())
+            if classifier_name not in get_ml_engine().trained_models:
+                available = list(get_ml_engine().trained_models.keys())
                 return {
                     "error": f"Classifier '{classifier_name}' not trained",
                     "available_classifiers": available
                 }, 400
 
             # Make prediction
-            prediction_result = ml_engine.predict_trust_score(features, classifier_name)
+            prediction_result = get_ml_engine().predict_trust_score(features, classifier_name)
 
             # Add metadata
             prediction_result.update({
@@ -180,8 +201,8 @@ class BatchPredictionResource(Resource):
                 return {"error": "batch_features must be a list"}, 400
 
             # Validate classifier
-            if classifier_name not in ml_engine.trained_models:
-                available = list(ml_engine.trained_models.keys())
+            if classifier_name not in get_ml_engine().trained_models:
+                available = list(get_ml_engine().trained_models.keys())
                 return {
                     "error": f"Classifier '{classifier_name}' not trained",
                     "available_classifiers": available
@@ -191,7 +212,7 @@ class BatchPredictionResource(Resource):
             predictions = []
             for i, features in enumerate(batch_features):
                 try:
-                    prediction = ml_engine.predict_trust_score(features, classifier_name)
+                    prediction = get_ml_engine().predict_trust_score(features, classifier_name)
                     prediction['sample_id'] = i
                     predictions.append(prediction)
                 except Exception as e:
@@ -222,13 +243,13 @@ class EvaluationResource(Resource):
         """Get comprehensive model performance metrics"""
         try:
             # Get performance metrics for all trained models
-            if not ml_engine.trained_models:
+            if not get_ml_engine().trained_models:
                 return {"error": "No trained models available for evaluation"}, 400
 
             performance_metrics = {}
 
-            for classifier_name in ml_engine.trained_models.keys():
-                metrics = ml_engine.get_model_performance(classifier_name)
+            for classifier_name in get_ml_engine().trained_models.keys():
+                metrics = get_ml_engine().get_model_performance(classifier_name)
                 if metrics:
                     performance_metrics[classifier_name] = metrics
 
@@ -238,7 +259,7 @@ class EvaluationResource(Resource):
             return {
                 "status": "success",
                 "timestamp": datetime.utcnow().isoformat(),
-                "performance_metrics": performance_metrics,
+                "performance_metrics": get_ml_engine().performance_metrics,
                 "summary": summary
             }, 200
 
@@ -264,8 +285,8 @@ class EvaluationResource(Resource):
                 return {"error": "No test data available"}, 400
 
             # Run evaluation
-            evaluation_results = evaluator.comprehensive_evaluation(
-                ml_engine.trained_models,
+            evaluation_results = get_evaluator().comprehensive_evaluation(
+                get_ml_engine().trained_models,
                 df,
                 output_dir=data.get("output_dir", "evaluation_results/")
             )
@@ -349,23 +370,23 @@ class VisualizationResource(Resource):
                 }, 400
 
             # Check if models are trained
-            if not ml_engine.trained_models:
+            if not get_ml_engine().trained_models:
                 return {"error": "No trained models available for visualization"}, 400
 
             # Generate visualization based on type
             if chart_type == 'confusion_matrix':
-                charts = visualizer.plot_confusion_matrices(ml_engine.trained_models)
+                charts = get_visualizer().plot_confusion_matrices(get_ml_engine().trained_models)
             elif chart_type == 'roc_curves':
-                charts = visualizer.plot_roc_curves(ml_engine.trained_models)
+                charts = get_visualizer().plot_roc_curves(get_ml_engine().trained_models)
             elif chart_type == 'feature_importance':
-                charts = visualizer.plot_feature_importance(ml_engine.trained_models)
+                charts = get_visualizer().plot_feature_importance(get_ml_engine().trained_models)
             elif chart_type == 'performance_comparison':
                 performance_data = {}
-                for name in ml_engine.trained_models.keys():
-                    performance_data[name] = ml_engine.get_model_performance(name)
+                for name in get_ml_engine().trained_models.keys():
+                    performance_data[name] = get_ml_engine().get_model_performance(name)
                 charts = visualizer.plot_classifier_comparison(performance_data)
             elif chart_type == 'trust_score_distribution':
-                charts = visualizer.plot_trust_score_distribution(ml_engine.trained_models)
+                charts = get_visualizer().plot_trust_score_distribution(get_ml_engine().trained_models)
 
             return {
                 "status": "success",
@@ -385,19 +406,19 @@ class ModelManagementResource(Resource):
         """Get information about trained models"""
         try:
             model_info = {
-                "trained_models": list(ml_engine.trained_models.keys()),
-                "available_classifiers": list(ml_engine.classifiers.keys()),
-                "training_history": ml_engine.training_history[-10:],  # Last 10 entries
+                "trained_models": list(get_ml_engine().trained_models.keys()),
+                "available_classifiers": list(get_ml_engine().classifiers.keys()),
+                "training_history": get_ml_engine().training_history[-10:],  # Last 10 entries
                 "model_metadata": {}
             }
 
             # Add metadata for each trained model
-            for model_name in ml_engine.trained_models.keys():
-                performance = ml_engine.get_model_performance(model_name)
+            for model_name in get_ml_engine().trained_models.keys():
+                performance = get_ml_engine().get_model_performance(model_name)
                 model_info["model_metadata"][model_name] = {
                     "performance": performance,
                     "trained": True,
-                    "classifier_type": type(ml_engine.classifiers[model_name]).__name__
+                    "classifier_type": type(get_ml_engine().classifiers[model_name]).__name__
                 }
 
             return {
@@ -420,7 +441,7 @@ class ModelManagementResource(Resource):
                 return {"error": f"Model path does not exist: {model_path}"}, 400
 
             # Load models
-            loaded_models = ml_engine.load_models(model_path)
+            loaded_models = get_ml_engine().load_models(model_path)
 
             return {
                 "status": "success",
@@ -436,10 +457,10 @@ class ModelManagementResource(Resource):
     def delete(self):
         """Clear all trained models from memory"""
         try:
-            cleared_models = list(ml_engine.trained_models.keys())
-            ml_engine.trained_models.clear()
-            ml_engine.scalers.clear()
-            ml_engine.performance_metrics.clear()
+            cleared_models = list(get_ml_engine().trained_models.keys())
+            get_ml_engine().trained_models.clear()
+            get_ml_engine().scalers.clear()
+            get_ml_engine().performance_metrics.clear()
 
             return {
                 "status": "success",
@@ -468,11 +489,11 @@ class BenchmarkResource(Resource):
                 "measure_latency": data.get("measure_latency", True)
             }
 
-            if not ml_engine.trained_models:
+            if not get_ml_engine().trained_models:
                 return {"error": "No trained models available for benchmarking"}, 400
 
             # Run benchmarks
-            benchmark_results = ml_engine.benchmark_performance(
+            benchmark_results = get_ml_engine().benchmark_performance(
                 num_samples=config["num_samples"],
                 iterations=config["iterations"]
             )
