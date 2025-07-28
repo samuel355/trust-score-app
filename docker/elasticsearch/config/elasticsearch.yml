@@ -19,19 +19,10 @@ xpack.security.enabled: true
 xpack.security.authc.api_key.enabled: true
 
 # HTTP SSL settings
-xpack.security.http.ssl.enabled: true
-xpack.security.http.ssl.key: /usr/share/elasticsearch/config/ssl/private/elasticsearch-key.pem
-xpack.security.http.ssl.certificate: /usr/share/elasticsearch/config/ssl/certs/elasticsearch-cert.pem
-xpack.security.http.ssl.certificate_authorities: /usr/share/elasticsearch/config/ssl/ca-cert.pem
-xpack.security.http.ssl.verification_mode: certificate
-xpack.security.http.ssl.client_authentication: optional
+xpack.security.http.ssl.enabled: false
 
 # Transport SSL settings
-xpack.security.transport.ssl.enabled: true
-xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/ssl/private/elasticsearch-key.pem
-xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/ssl/certs/elasticsearch-cert.pem
-xpack.security.transport.ssl.certificate_authorities: /usr/share/elasticsearch/config/ssl/ca-cert.pem
-xpack.security.transport.ssl.verification_mode: certificate
+xpack.security.transport.ssl.enabled: false
 
 # Monitoring settings
 xpack.monitoring.collection.enabled: true

@@ -10,18 +10,12 @@ services:
       - cluster.name=trust-engine-cluster
       - discovery.type=single-node
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx2g"
       - xpack.security.enabled=true
       - ELASTIC_PASSWORD=trust-engine-elastic-password
       - xpack.security.authc.api_key.enabled=true
-      - xpack.security.http.ssl.enabled=true
-      - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/ssl/private/elasticsearch-key.pem
-      - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/ssl/certs/elasticsearch-cert.pem
-      - xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/ssl/ca/ca-cert.pem
-      - xpack.security.transport.ssl.enabled=true
-      - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/ssl/private/elasticsearch-key.pem
-      - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/ssl/certs/elasticsearch-cert.pem
-      - xpack.security.transport.ssl.certificate_authorities=/usr/share/elasticsearch/config/ssl/ca/ca-cert.pem
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
     ulimits:
       memlock:
         soft: -1
@@ -29,7 +23,6 @@ services:
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
       - ./docker/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
-      - ./docker/ssl:/usr/share/elasticsearch/config/ssl:ro
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -39,7 +32,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "curl -k -u elastic:trust-engine-elastic-password -f https://localhost:9200/_cluster/health || exit 1",
+          "curl -u elastic:trust-engine-elastic-password -f http://localhost:9200/_cluster/health || exit 1",
         ]
       interval: 30s
       timeout: 10s
@@ -51,20 +44,16 @@ services:
     container_name: trust-engine-kibana
     environment:
       - SERVERNAME=kibana
-      - ELASTICSEARCH_HOSTS=https://elasticsearch:9200
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - ELASTICSEARCH_USERNAME=elastic
       - ELASTICSEARCH_PASSWORD=trust-engine-elastic-password
-      - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=/usr/share/kibana/config/ssl/ca/ca-cert.pem
-      - ELASTICSEARCH_SSL_VERIFICATIONMODE=certificate
+      - ELASTICSEARCH_SSL_VERIFICATIONMODE=none
       - xpack.security.enabled=true
       - xpack.encryptedSavedObjects.encryptionKey=trust-engine-kibana-encryption-key-32-chars
-      - SERVER_SSL_ENABLED=true
-      - SERVER_SSL_KEY=/usr/share/kibana/config/ssl/private/kibana-key.pem
-      - SERVER_SSL_CERTIFICATE=/usr/share/kibana/config/ssl/certs/kibana-cert.pem
+      - SERVER_SSL_ENABLED=false
     volumes:
       - kibana-data:/usr/share/kibana/data
       - ./docker/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
-      - ./docker/ssl:/usr/share/kibana/config/ssl:ro
     ports:
       - "5601:5601"
     networks:
@@ -73,8 +62,7 @@ services:
       elasticsearch:
         condition: service_healthy
     healthcheck:
-      test:
-        ["CMD-SHELL", "curl -k -f https://localhost:5601/api/status || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -181,7 +169,7 @@ services:
       - FLASK_DEBUG=1
       - FLASK_SSL_CERT=/app/docker/ssl/certs/trust-engine-cert.pem
       - FLASK_SSL_KEY=/app/docker/ssl/private/trust-engine-key.pem
-      - ELASTICSEARCH_URL=https://elasticsearch:9200
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
       - ELASTICSEARCH_USERNAME=elastic
       - ELASTICSEARCH_PASSWORD=trust-engine-elastic-password
       - ELASTICSEARCH_SSL_VERIFY=false
