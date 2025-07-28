@@ -8,3 +8,24 @@ requests        # For API communication (Wazuh, Elasticsearch)
 elasticsearch    # Elasticsearch client library
 supabase
 flask-login      # User session management
+
+# ML and Visualization Dependencies
+numpy>=1.21.0
+matplotlib>=3.5.0
+seaborn>=0.11.0
+plotly>=5.0.0
+joblib>=1.1.0
+scipy>=1.7.0
+
+# Additional ML utilities
+imbalanced-learn>=0.8.0
+xgboost>=1.5.0
+lightgbm>=3.3.0
+
+# Performance monitoring
+psutil>=5.8.0
+memory-profiler>=0.60.0
+
+# API documentation
+flask-swagger-ui>=4.11.1
+flasgger>=0.9.5

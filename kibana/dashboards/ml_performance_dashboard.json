@@ -1,0 +1,224 @@
+{
+  "version": "8.10.0",
+  "objects": [
+    {
+      "id": "ml-performance-dashboard",
+      "type": "dashboard",
+      "attributes": {
+        "title": "Trust Engine ML Performance Dashboard",
+        "description": "Real-time monitoring of ML classifier performance, trust scores, and system metrics",
+        "panelsJSON": "[{\"version\":\"8.10.0\",\"gridData\":{\"x\":0,\"y\":0,\"w\":24,\"h\":8},\"panelIndex\":\"1\",\"embeddableConfig\":{},\"panelRefName\":\"panel_1\"},{\"version\":\"8.10.0\",\"gridData\":{\"x\":24,\"y\":0,\"w\":24,\"h\":8},\"panelIndex\":\"2\",\"embeddableConfig\":{},\"panelRefName\":\"panel_2\"},{\"version\":\"8.10.0\",\"gridData\":{\"x\":0,\"y\":8,\"w\":16,\"h\":12},\"panelIndex\":\"3\",\"embeddableConfig\":{},\"panelRefName\":\"panel_3\"},{\"version\":\"8.10.0\",\"gridData\":{\"x\":16,\"y\":8,\"w\":16,\"h\":12},\"panelIndex\":\"4\",\"embeddableConfig\":{},\"panelRefName\":\"panel_4\"},{\"version\":\"8.10.0\",\"gridData\":{\"x\":32,\"y\":8,\"w\":16,\"h\":12},\"panelIndex\":\"5\",\"embeddableConfig\":{},\"panelRefName\":\"panel_5\"},{\"version\":\"8.10.0\",\"gridData\":{\"x\":0,\"y\":20,\"w\":24,\"h\":12},\"panelIndex\":\"6\",\"embeddableConfig\":{},\"panelRefName\":\"panel_6\"},{\"version\":\"8.10.0\",\"gridData\":{\"x\":24,\"y\":20,\"w\":24,\"h\":12},\"panelIndex\":\"7\",\"embeddableConfig\":{},\"panelRefName\":\"panel_7\"},{\"version\":\"8.10.0\",\"gridData\":{\"x\":0,\"y\":32,\"w\":12,\"h\":8},\"panelIndex\":\"8\",\"embeddableConfig\":{},\"panelRefName\":\"panel_8\"},{\"version\":\"8.10.0\",\"gridData\":{\"x\":12,\"y\":32,\"w\":12,\"h\":8},\"panelIndex\":\"9\",\"embeddableConfig\":{},\"panelRefName\":\"panel_9\"},{\"version\":\"8.10.0\",\"gridData\":{\"x\":24,\"y\":32,\"w\":12,\"h\":8},\"panelIndex\":\"10\",\"embeddableConfig\":{},\"panelRefName\":\"panel_10\"},{\"version\":\"8.10.0\",\"gridData\":{\"x\":36,\"y\":32,\"w\":12,\"h\":8},\"panelIndex\":\"11\",\"embeddableConfig\":{},\"panelRefName\":\"panel_11\"}]",
+        "timeRestore": false,
+        "timeTo": "now",
+        "timeFrom": "now-24h",
+        "refreshInterval": {
+          "pause": false,
+          "value": 30000
+        },
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"query\":{\"match_all\":{}},\"filter\":[]}"
+        }
+      },
+      "references": [
+        {
+          "name": "panel_1",
+          "type": "visualization",
+          "id": "trust-score-timeline"
+        },
+        {
+          "name": "panel_2",
+          "type": "visualization",
+          "id": "ml-accuracy-metrics"
+        },
+        {
+          "name": "panel_3",
+          "type": "visualization",
+          "id": "classifier-performance-comparison"
+        },
+        {
+          "name": "panel_4",
+          "type": "visualization",
+          "id": "prediction-latency"
+        },
+        {
+          "name": "panel_5",
+          "type": "visualization",
+          "id": "risk-level-distribution"
+        },
+        {
+          "name": "panel_6",
+          "type": "visualization",
+          "id": "authentication-events"
+        },
+        {
+          "name": "panel_7",
+          "type": "visualization",
+          "id": "mfa-trigger-rate"
+        },
+        {
+          "name": "panel_8",
+          "type": "visualization",
+          "id": "false-positive-rate"
+        },
+        {
+          "name": "panel_9",
+          "type": "visualization",
+          "id": "system-throughput"
+        },
+        {
+          "name": "panel_10",
+          "type": "visualization",
+          "id": "model-usage-stats"
+        },
+        {
+          "name": "panel_11",
+          "type": "visualization",
+          "id": "alert-correlation"
+        }
+      ]
+    },
+    {
+      "id": "trust-score-timeline",
+      "type": "visualization",
+      "attributes": {
+        "title": "Trust Score Timeline",
+        "visState": "{\"title\":\"Trust Score Timeline\",\"type\":\"line\",\"aggs\":[{\"id\":\"1\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"trust_score\"}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1}}]}",
+        "uiStateJSON": "{}",
+        "description": "Average trust score over time showing authentication confidence trends",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"trustscore-*\",\"query\":{\"match_all\":{}},\"filter\":[]}"
+        }
+      }
+    },
+    {
+      "id": "ml-accuracy-metrics",
+      "type": "visualization",
+      "attributes": {
+        "title": "ML Classifier Accuracy Metrics",
+        "visState": "{\"title\":\"ML Classifier Accuracy Metrics\",\"type\":\"metric\",\"aggs\":[{\"id\":\"1\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"accuracy\"}},{\"id\":\"2\",\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"classifier_name.keyword\",\"size\":10}}]}",
+        "uiStateJSON": "{}",
+        "description": "Real-time accuracy metrics for all ML classifiers",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"ml-metrics-*\",\"query\":{\"match_all\":{}},\"filter\":[]}"
+        }
+      }
+    },
+    {
+      "id": "classifier-performance-comparison",
+      "type": "visualization",
+      "attributes": {
+        "title": "Classifier Performance Comparison",
+        "visState": "{\"title\":\"Classifier Performance Comparison\",\"type\":\"horizontal_bar\",\"aggs\":[{\"id\":\"1\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"f1_score\"}},{\"id\":\"2\",\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"classifier_name.keyword\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
+        "uiStateJSON": "{}",
+        "description": "F1-score comparison across all ML classifiers",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"ml-metrics-*\",\"query\":{\"match_all\":{}},\"filter\":[]}"
+        }
+      }
+    },
+    {
+      "id": "prediction-latency",
+      "type": "visualization",
+      "attributes": {
+        "title": "Prediction Latency (ms)",
+        "visState": "{\"title\":\"Prediction Latency (ms)\",\"type\":\"line\",\"aggs\":[{\"id\":\"1\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"prediction_latency_ms\"}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"1m\",\"min_doc_count\":1}},{\"id\":\"3\",\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"classifier_name.keyword\",\"size\":6}}]}",
+        "uiStateJSON": "{}",
+        "description": "Authentication latency tracking for performance optimization",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"ml-performance-*\",\"query\":{\"match_all\":{}},\"filter\":[]}"
+        }
+      }
+    },
+    {
+      "id": "risk-level-distribution",
+      "type": "visualization",
+      "attributes": {
+        "title": "Risk Level Distribution",
+        "visState": "{\"title\":\"Risk Level Distribution\",\"type\":\"pie\",\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"risk_level\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
+        "uiStateJSON": "{}",
+        "description": "Distribution of risk levels (Low, Medium, High, Critical)",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"trustscore-*\",\"query\":{\"match_all\":{}},\"filter\":[]}"
+        }
+      }
+    },
+    {
+      "id": "authentication-events",
+      "type": "visualization",
+      "attributes": {
+        "title": "Authentication Events Timeline",
+        "visState": "{\"title\":\"Authentication Events Timeline\",\"type\":\"area\",\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"5m\",\"min_doc_count\":1}},{\"id\":\"3\",\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"auth_result.keyword\",\"size\":5}}]}",
+        "uiStateJSON": "{}",
+        "description": "Authentication success/failure events over time",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"auth-events-*\",\"query\":{\"match_all\":{}},\"filter\":[]}"
+        }
+      }
+    },
+    {
+      "id": "mfa-trigger-rate",
+      "type": "visualization",
+      "attributes": {
+        "title": "MFA Trigger Rate",
+        "visState": "{\"title\":\"MFA Trigger Rate\",\"type\":\"line\",\"aggs\":[{\"id\":\"1\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"mfa_required\",\"script\":\"doc['mfa_required'].value ? 1 : 0\"}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"10m\",\"min_doc_count\":1}}]}",
+        "uiStateJSON": "{}",
+        "description": "Percentage of authentications requiring MFA",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"trustscore-*\",\"query\":{\"match_all\":{}},\"filter\":[]}"
+        }
+      }
+    },
+    {
+      "id": "false-positive-rate",
+      "type": "visualization",
+      "attributes": {
+        "title": "False Positive Rate",
+        "visState": "{\"title\":\"False Positive Rate\",\"type\":\"metric\",\"aggs\":[{\"id\":\"1\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"false_positive_rate\"}}]}",
+        "uiStateJSON": "{}",
+        "description": "Current false positive rate across all classifiers",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"ml-metrics-*\",\"query\":{\"match_all\":{}},\"filter\":[{\"range\":{\"@timestamp\":{\"gte\":\"now-1h\"}}}]}"
+        }
+      }
+    },
+    {
+      "id": "system-throughput",
+      "type": "visualization",
+      "attributes": {
+        "title": "System Throughput (sessions/min)",
+        "visState": "{\"title\":\"System Throughput (sessions/min)\",\"type\":\"metric\",\"aggs\":[{\"id\":\"1\",\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"session_id.keyword\"}}]}",
+        "uiStateJSON": "{}",
+        "description": "Authentication sessions processed per minute",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"trustscore-*\",\"query\":{\"match_all\":{}},\"filter\":[{\"range\":{\"@timestamp\":{\"gte\":\"now-1m\"}}}]}"
+        }
+      }
+    },
+    {
+      "id": "model-usage-stats",
+      "type": "visualization",
+      "attributes": {
+        "title": "Model Usage Statistics",
+        "visState": "{\"title\":\"Model Usage Statistics\",\"type\":\"horizontal_bar\",\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"classifier_used.keyword\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\"}}]}",
+        "uiStateJSON": "{}",
+        "description": "Usage frequency of each ML classifier",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"ml-predictions-*\",\"query\":{\"match_all\":{}},\"filter\":[]}"
+        }
+      }
+    },
+    {
+      "id": "alert-correlation",
+      "type": "visualization",
+      "attributes": {
+        "title": "Security Alert Correlation",
+        "visState": "{\"title\":\"Security Alert Correlation\",\"type\":\"heatmap\",\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"stride_category.keyword\",\"size\":10}},{\"id\":\"3\",\"type\":\"range\",\"schema\":\"group\",\"params\":{\"field\":\"trust_score\",\"ranges\":[{\"from\":0,\"to\":0.3},{\"from\":0.3,\"to\":0.6},{\"from\":0.6,\"to\":1.0}]}}]}",
+        "uiStateJSON": "{}",
+        "description": "Correlation between STRIDE categories and trust scores",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"index\":\"wazuh-alerts-*\",\"query\":{\"match_all\":{}},\"filter\":[]}"
+        }
+      }
+    }
+  ]
+}

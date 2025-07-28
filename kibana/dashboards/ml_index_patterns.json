@@ -1,0 +1,89 @@
+{
+  "version": "8.10.0",
+  "objects": [
+    {
+      "id": "ml-metrics-index-pattern",
+      "type": "index-pattern",
+      "attributes": {
+        "title": "ml-metrics-*",
+        "timeFieldName": "@timestamp",
+        "fields": "[{\"name\":\"@timestamp\",\"type\":\"date\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"classifier_name\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"classifier_name.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"accuracy\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"precision\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"recall\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"f1_score\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"auc_score\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"false_positive_rate\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"false_negative_rate\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"training_time_seconds\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"prediction_samples\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"model_version\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"model_version.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"cross_validation_score\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"feature_count\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true}]",
+        "fieldFormatMap": "{\"accuracy\":{\"id\":\"percent\"},\"precision\":{\"id\":\"percent\"},\"recall\":{\"id\":\"percent\"},\"f1_score\":{\"id\":\"percent\"},\"auc_score\":{\"id\":\"percent\"},\"false_positive_rate\":{\"id\":\"percent\"},\"false_negative_rate\":{\"id\":\"percent\"}}",
+        "sourceFilters": "[]",
+        "typeMeta": "{}"
+      }
+    },
+    {
+      "id": "ml-performance-index-pattern",
+      "type": "index-pattern",
+      "attributes": {
+        "title": "ml-performance-*",
+        "timeFieldName": "@timestamp",
+        "fields": "[{\"name\":\"@timestamp\",\"type\":\"date\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"classifier_name\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"classifier_name.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"prediction_latency_ms\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"memory_usage_mb\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"cpu_usage_percent\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"throughput_predictions_per_second\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"batch_size\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"feature_extraction_time_ms\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"model_loading_time_ms\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"session_id\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"session_id.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"vm_id\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"vm_id.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true}]",
+        "fieldFormatMap": "{\"prediction_latency_ms\":{\"id\":\"duration\",\"params\":{\"inputFormat\":\"milliseconds\",\"outputFormat\":\"humanizePrecise\"}},\"memory_usage_mb\":{\"id\":\"bytes\",\"params\":{\"pattern\":\"0.0 b\"}},\"cpu_usage_percent\":{\"id\":\"percent\"}}",
+        "sourceFilters": "[]",
+        "typeMeta": "{}"
+      }
+    },
+    {
+      "id": "ml-predictions-index-pattern",
+      "type": "index-pattern",
+      "attributes": {
+        "title": "ml-predictions-*",
+        "timeFieldName": "@timestamp",
+        "fields": "[{\"name\":\"@timestamp\",\"type\":\"date\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"session_id\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"session_id.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"vm_id\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"vm_id.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"user_id\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"user_id.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"classifier_used\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"classifier_used.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"trust_score\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"confidence_score\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"risk_level\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"risk_level.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"stride_category\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"stride_category.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"mfa_required\",\"type\":\"boolean\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"prediction_probability\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"feature_vector\",\"type\":\"object\",\"searchable\":false,\"aggregatable\":false},{\"name\":\"prediction_time_ms\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"model_version\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"model_version.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true}]",
+        "fieldFormatMap": "{\"trust_score\":{\"id\":\"percent\"},\"confidence_score\":{\"id\":\"percent\"},\"prediction_probability\":{\"id\":\"percent\"},\"prediction_time_ms\":{\"id\":\"duration\",\"params\":{\"inputFormat\":\"milliseconds\",\"outputFormat\":\"humanizePrecise\"}}}",
+        "sourceFilters": "[\"feature_vector.*\"]",
+        "typeMeta": "{}"
+      }
+    },
+    {
+      "id": "auth-events-index-pattern",
+      "type": "index-pattern",
+      "attributes": {
+        "title": "auth-events-*",
+        "timeFieldName": "@timestamp",
+        "fields": "[{\"name\":\"@timestamp\",\"type\":\"date\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"session_id\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"session_id.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"user_id\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"user_id.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"vm_id\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"vm_id.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"auth_method\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"auth_method.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"auth_result\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"auth_result.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"trust_score\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"mfa_triggered\",\"type\":\"boolean\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"mfa_result\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"mfa_result.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"risk_factors\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"ip_address\",\"type\":\"ip\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"user_agent\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"geolocation\",\"type\":\"geo_point\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"device_fingerprint\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"device_fingerprint.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"auth_duration_ms\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"failed_attempts\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true}]",
+        "fieldFormatMap": "{\"trust_score\":{\"id\":\"percent\"},\"auth_duration_ms\":{\"id\":\"duration\",\"params\":{\"inputFormat\":\"milliseconds\",\"outputFormat\":\"humanizePrecise\"}},\"geolocation\":{\"id\":\"geo_point\"}}",
+        "sourceFilters": "[]",
+        "typeMeta": "{}"
+      }
+    },
+    {
+      "id": "trustscore-index-pattern",
+      "type": "index-pattern",
+      "attributes": {
+        "title": "trustscore-*",
+        "timeFieldName": "@timestamp",
+        "fields": "[{\"name\":\"@timestamp\",\"type\":\"date\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"session_id\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"session_id.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"vm_id\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"vm_id.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"vm_agent_id\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"vm_agent_id.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"user_id\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"user_id.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"trust_score\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"confidence_level\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"risk_level\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"risk_level.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"mfa_required\",\"type\":\"boolean\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"stride_category\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"stride_category.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"threat_indicators\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"behavioral_score\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"network_score\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"temporal_score\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"classifier_consensus\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"ml_model_used\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"ml_model_used.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true}]",
+        "fieldFormatMap": "{\"trust_score\":{\"id\":\"percent\"},\"confidence_level\":{\"id\":\"percent\"},\"behavioral_score\":{\"id\":\"percent\"},\"network_score\":{\"id\":\"percent\"},\"temporal_score\":{\"id\":\"percent\"},\"classifier_consensus\":{\"id\":\"percent\"}}",
+        "sourceFilters": "[]",
+        "typeMeta": "{}"
+      }
+    },
+    {
+      "id": "wazuh-alerts-index-pattern",
+      "type": "index-pattern",
+      "attributes": {
+        "title": "wazuh-alerts-*",
+        "timeFieldName": "@timestamp",
+        "fields": "[{\"name\":\"@timestamp\",\"type\":\"date\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"alert_id\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"alert_id.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"agent_id\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"agent_id.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"agent_name\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"agent_name.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"rule_id\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"rule_id.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"rule_level\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"rule_description\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"rule_mitre_id\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"rule_mitre_id.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"stride_category\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"stride_category.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"risk_level\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"trust_score\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"mfa_required\",\"type\":\"boolean\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"src_ip\",\"type\":\"ip\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"dst_ip\",\"type\":\"ip\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"src_port\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"dst_port\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"protocol\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"protocol.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"alert_severity\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"alert_severity.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true}]",
+        "fieldFormatMap": "{\"trust_score\":{\"id\":\"percent\"},\"src_ip\":{\"id\":\"ip\"},\"dst_ip\":{\"id\":\"ip\"}}",
+        "sourceFilters": "[\"raw_alert.*\"]",
+        "typeMeta": "{}"
+      }
+    },
+    {
+      "id": "telemetrydata-index-pattern",
+      "type": "index-pattern",
+      "attributes": {
+        "title": "telemetrydata-*",
+        "timeFieldName": "@timestamp",
+        "fields": "[{\"name\":\"@timestamp\",\"type\":\"date\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"vm_id\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"vm_id.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"vm_agent_id\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"vm_agent_id.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"event_type\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"event_type.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"stride_category\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"stride_category.keyword\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"risk_level\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"flow_duration\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"total_fwd_packets\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"total_backward_packets\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"total_length_fwd_packets\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"total_length_bwd_packets\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"fwd_packet_length_max\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"fwd_packet_length_min\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"fwd_packet_length_mean\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"bwd_packet_length_max\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"bwd_packet_length_min\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"bwd_packet_length_mean\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"flow_bytes_per_second\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"flow_packets_per_second\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"flow_iat_mean\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"flow_iat_std\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"fwd_iat_total\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"fwd_iat_mean\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"bwd_iat_total\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"bwd_iat_mean\",\"type\":\"number\",\"searchable\":true,\"aggregatable\":true}]",
+        "fieldFormatMap": "{\"flow_bytes_per_second\":{\"id\":\"bytes\",\"params\":{\"pattern\":\"0.0 b\"}},\"total_length_fwd_packets\":{\"id\":\"bytes\"},\"total_length_bwd_packets\":{\"id\":\"bytes\"}}",
+        "sourceFilters": "[]",
+        "typeMeta": "{}"
+      }
+    }
+  ]
+}

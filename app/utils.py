@@ -30,14 +30,74 @@ def generate_synthetic_telemetry():
 
 
 def load_sample_cicids2017_data():
-    """Load sample CICIDS2017 data from JSON file for testing"""
-    file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'sample_cicids2017_data.json')
-    try:
-        with open(file_path, 'r') as f:
-            return json.load(f)
-    except FileNotFoundError:
-        print(f"Sample data file not found at {file_path}")
-        return None
+    """Load sample CICIDS2017 data and return as pandas DataFrame for testing"""
+    import pandas as pd
+    import numpy as np
+
+    # Create synthetic CICIDS2017-style dataset with multiple samples
+    np.random.seed(42)  # For reproducible results
+
+    n_samples = 1000
+    feature_names = [
+        'Flow Duration', 'Total Fwd Packets', 'Total Backward Packets',
+        'Total Length of Fwd Packets', 'Total Length of Bwd Packets',
+        'Fwd Packet Length Max', 'Fwd Packet Length Min', 'Fwd Packet Length Mean',
+        'Fwd Packet Length Std', 'Bwd Packet Length Max', 'Bwd Packet Length Min',
+        'Bwd Packet Length Mean', 'Bwd Packet Length Std', 'Flow Bytes/s',
+        'Flow Packets/s', 'Flow IAT Mean', 'Flow IAT Std', 'Flow IAT Max',
+        'Flow IAT Min', 'Fwd IAT Total', 'Fwd IAT Mean', 'Fwd IAT Std',
+        'Fwd IAT Max', 'Fwd IAT Min', 'Bwd IAT Total', 'Bwd IAT Mean',
+        'Bwd IAT Std', 'Bwd IAT Max', 'Bwd IAT Min', 'Fwd PSH Flags',
+        'Bwd PSH Flags', 'Fwd URG Flags', 'Bwd URG Flags', 'Fwd Header Length',
+        'Bwd Header Length', 'Fwd Packets/s', 'Bwd Packets/s', 'Min Packet Length',
+        'Max Packet Length', 'Packet Length Mean', 'Packet Length Std',
+        'Packet Length Variance', 'FIN Flag Count', 'SYN Flag Count',
+        'RST Flag Count', 'PSH Flag Count', 'ACK Flag Count', 'URG Flag Count',
+        'CWE Flag Count', 'ECE Flag Count', 'Down/Up Ratio', 'Average Packet Size',
+        'Avg Fwd Segment Size', 'Avg Bwd Segment Size', 'Fwd Header Length.1',
+        'Fwd Avg Bytes/Bulk', 'Fwd Avg Packets/Bulk', 'Fwd Avg Bulk Rate',
+        'Bwd Avg Bytes/Bulk', 'Bwd Avg Packets/Bulk', 'Bwd Avg Bulk Rate',
+        'Subflow Fwd Packets', 'Subflow Fwd Bytes', 'Subflow Bwd Packets'
+    ]
+
+    # Generate synthetic data
+    data = {}
+
+    for feature in feature_names:
+        if 'Packets' in feature or 'Count' in feature or 'Flags' in feature:
+            # Integer features
+            data[feature] = np.random.poisson(lam=5, size=n_samples)
+        elif 'Length' in feature or 'Size' in feature or 'Bytes' in feature:
+            # Size-related features
+            data[feature] = np.random.exponential(scale=100, size=n_samples)
+        elif 'Duration' in feature or 'IAT' in feature:
+            # Time-related features
+            data[feature] = np.random.exponential(scale=0.1, size=n_samples)
+        elif 'Rate' in feature or '/s' in feature:
+            # Rate features
+            data[feature] = np.random.exponential(scale=1000, size=n_samples)
+        elif 'Ratio' in feature:
+            # Ratio features
+            data[feature] = np.random.uniform(0, 1, size=n_samples)
+        else:
+            # General numeric features
+            data[feature] = np.random.normal(loc=50, scale=15, size=n_samples)
+
+    # Create labels (80% benign, 20% malicious)
+    labels = np.random.choice(['BENIGN', 'MALICIOUS'], size=n_samples, p=[0.8, 0.2])
+    data['Label'] = labels
+
+    # Create DataFrame
+    df = pd.DataFrame(data)
+
+    # Ensure no negative values for features that shouldn't be negative
+    numeric_columns = df.select_dtypes(include=[np.number]).columns
+    df[numeric_columns] = df[numeric_columns].abs()
+
+    print(f"✅ Generated synthetic CICIDS2017 dataset: {df.shape[0]} samples, {df.shape[1]} features")
+    print(f"   Label distribution: {df['Label'].value_counts().to_dict()}")
+
+    return df
 
 
 def get_elasticsearch_client():
