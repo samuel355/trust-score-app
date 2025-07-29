@@ -87,10 +87,11 @@ class TrainingResource(Resource):
             # Configuration options
             config = {
                 "use_sample_data": data.get("use_sample_data", True),
+                "data_source": data.get("data_source", "sample_template"),  # New parameter
                 "test_size": data.get("test_size", 0.2),
                 "cross_validation": data.get("cross_validation", True),
                 "cv_folds": data.get("cv_folds", 5),
-                "save_models": data.get("save_models", True),
+                "save_models": data.get("save_models", False),
                 "model_path": data.get("model_path", "models/")
             }
 
@@ -98,8 +99,27 @@ class TrainingResource(Resource):
 
             # Load training data
             if config["use_sample_data"]:
-                df = load_sample_cicids2017_data()
-                logger.info(f"Loaded sample CICIDS2017 data: {df.shape}")
+                # Choose data loading method based on data_source parameter
+                data_source = config.get("data_source", "sample_template")
+
+                if data_source == "sample_template":
+                    # Use sample JSON as template (default)
+                    df = load_sample_cicids2017_data()
+                    logger.info(f"Loaded sample-based CICIDS2017 data: {df.shape}")
+                elif data_source == "sample_variations":
+                    # Use sample JSON with variations
+                    from app.utils import load_real_sample_cicids2017_data
+                    df = load_real_sample_cicids2017_data()
+                    logger.info(f"Loaded sample variation CICIDS2017 data: {df.shape}")
+                elif data_source == "multiple_files":
+                    # Load multiple JSON files from data directory
+                    from app.utils import load_multiple_cicids2017_files
+                    df = load_multiple_cicids2017_files()
+                    logger.info(f"Loaded multiple file CICIDS2017 data: {df.shape}")
+                else:
+                    # Default fallback
+                    df = load_sample_cicids2017_data()
+                    logger.info(f"Using default sample data loading: {df.shape}")
             else:
                 # Load from Supabase or custom dataset
                 supabase = get_supabase_client()

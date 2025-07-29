@@ -24,7 +24,7 @@
     "auc": 0
   },
   "MLP": {
-    "error": "Labels in y_true and y_pred should be of the same type. Got y_true=['BENIGN' 'MALICIOUS'] and y_pred=[ 5 10]. Make sure that the predictions provided by the classifier coincides with the true labels.",
+    "error": "Labels in y_true and y_pred should be of the same type. Got y_true=['BENIGN' 'MALICIOUS'] and y_pred=[10]. Make sure that the predictions provided by the classifier coincides with the true labels.",
     "accuracy": 0,
     "precision": 0,
     "recall": 0,

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-07-28T21:57:35.409899",
+  "timestamp": "2025-07-28T22:45:55.561082",
   "test_summary": {
     "total_tests": 7,
     "passed_tests": 7,
@@ -10,16 +10,16 @@
     "data_loading": {
       "status": "passed",
       "samples": 1000,
-      "features": 65,
+      "features": 70,
       "missing_values": "0",
       "label_distribution": {
-        "BENIGN": 809,
-        "MALICIOUS": 191
+        "BENIGN": 779,
+        "MALICIOUS": 221
       }
     },
     "ml_training": {
       "status": "passed",
-      "training_time_seconds": 589.9322490692139,
+      "training_time_seconds": 568.1833078861237,
       "trained_models": [
         "RandomForest",
         "KNN",
@@ -31,142 +31,142 @@
       "missing_models": [],
       "training_results": {
         "RandomForest": {
-          "accuracy": 0.81,
-          "precision": 0.6561,
-          "recall": 0.81,
-          "f1_score": 0.7249723756906077,
+          "accuracy": 0.78,
+          "precision": 0.6084,
+          "recall": 0.78,
+          "f1_score": 0.6835955056179777,
           "confusion_matrix": [
             [
               0,
-              38
+              44
             ],
             [
               0,
-              162
+              156
             ]
           ],
-          "classification_report": "              precision    recall  f1-score   support\n\n           5       0.00      0.00      0.00        38\n          10       0.81      1.00      0.90       162\n\n    accuracy                           0.81       200\n   macro avg       0.41      0.50      0.45       200\nweighted avg       0.66      0.81      0.72       200\n",
+          "classification_report": "              precision    recall  f1-score   support\n\n           5       0.00      0.00      0.00        44\n          10       0.78      1.00      0.88       156\n\n    accuracy                           0.78       200\n   macro avg       0.39      0.50      0.44       200\nweighted avg       0.61      0.78      0.68       200\n",
           "false_negative_rate": 0.5,
           "roc_auc": 0,
-          "training_time": 0.320049,
+          "training_time": 0.316316,
           "model_name": "RandomForest",
-          "cv_mean": 0.8087500000000001,
+          "cv_mean": 0.7787499999999999,
           "cv_std": 0.003061862178478962
         },
         "KNN": {
-          "accuracy": 0.79,
-          "precision": 0.7268439716312056,
-          "recall": 0.79,
-          "f1_score": 0.7432000000000001,
+          "accuracy": 0.775,
+          "precision": 0.7300867888138862,
+          "recall": 0.775,
+          "f1_score": 0.7341650950239373,
           "confusion_matrix": [
-            [
-              4,
-              34
-            ],
             [
               8,
-              154
-            ]
-          ],
-          "classification_report": "              precision    recall  f1-score   support\n\n           5       0.33      0.11      0.16        38\n          10       0.82      0.95      0.88       162\n\n    accuracy                           0.79       200\n   macro avg       0.58      0.53      0.52       200\nweighted avg       0.73      0.79      0.74       200\n",
-          "false_negative_rate": 0.47205977907732294,
-          "roc_auc": 0,
-          "training_time": 0.074093,
-          "model_name": "KNN",
-          "cv_mean": 0.7762500000000001,
-          "cv_std": 0.01785357107135715
-        },
-        "NaiveBayes": {
-          "accuracy": 0.71,
-          "precision": 0.7213441832429175,
-          "recall": 0.71,
-          "f1_score": 0.7154374999999998,
-          "confusion_matrix": [
-            [
-              11,
-              27
+              36
             ],
             [
-              31,
+              9,
+              147
+            ]
+          ],
+          "classification_report": "              precision    recall  f1-score   support\n\n           5       0.47      0.18      0.26        44\n          10       0.80      0.94      0.87       156\n\n    accuracy                           0.78       200\n   macro avg       0.64      0.56      0.56       200\nweighted avg       0.73      0.78      0.73       200\n",
+          "false_negative_rate": 0.43793706293706297,
+          "roc_auc": 0,
+          "training_time": 0.082983,
+          "model_name": "KNN",
+          "cv_mean": 0.7224999999999999,
+          "cv_std": 0.012247448713915886
+        },
+        "NaiveBayes": {
+          "accuracy": 0.775,
+          "precision": 0.607537688442211,
+          "recall": 0.775,
+          "f1_score": 0.6811267605633802,
+          "confusion_matrix": [
+            [
+              0,
+              44
+            ],
+            [
+              1,
+              155
+            ]
+          ],
+          "classification_report": "              precision    recall  f1-score   support\n\n           5       0.00      0.00      0.00        44\n          10       0.78      0.99      0.87       156\n\n    accuracy                           0.78       200\n   macro avg       0.39      0.50      0.44       200\nweighted avg       0.61      0.78      0.68       200\n",
+          "false_negative_rate": 0.5032051282051282,
+          "roc_auc": 0,
+          "training_time": 0.004592,
+          "model_name": "NaiveBayes",
+          "cv_mean": 0.77625,
+          "cv_std": 0.008291561975888507
+        },
+        "MLP": {
+          "accuracy": 0.68,
+          "precision": 0.6377254901960785,
+          "recall": 0.68,
+          "f1_score": 0.6566008953739015,
+          "confusion_matrix": [
+            [
+              5,
+              39
+            ],
+            [
+              25,
               131
             ]
           ],
-          "classification_report": "              precision    recall  f1-score   support\n\n           5       0.26      0.29      0.28        38\n          10       0.83      0.81      0.82       162\n\n    accuracy                           0.71       200\n   macro avg       0.55      0.55      0.55       200\nweighted avg       0.72      0.71      0.72       200\n",
-          "false_negative_rate": 0.45094217024041583,
+          "classification_report": "              precision    recall  f1-score   support\n\n           5       0.17      0.11      0.14        44\n          10       0.77      0.84      0.80       156\n\n    accuracy                           0.68       200\n   macro avg       0.47      0.48      0.47       200\nweighted avg       0.64      0.68      0.66       200\n",
+          "false_negative_rate": 0.5233100233100233,
           "roc_auc": 0,
-          "training_time": 0.003092,
-          "model_name": "NaiveBayes",
-          "cv_mean": 0.7,
-          "cv_std": 0.02592055169165961
-        },
-        "MLP": {
-          "accuracy": 0.76,
-          "precision": 0.7345016611295683,
-          "recall": 0.76,
-          "f1_score": 0.7454109961894393,
-          "confusion_matrix": [
-            [
-              9,
-              29
-            ],
-            [
-              19,
-              143
-            ]
-          ],
-          "classification_report": "              precision    recall  f1-score   support\n\n           5       0.32      0.24      0.27        38\n          10       0.83      0.88      0.86       162\n\n    accuracy                           0.76       200\n   macro avg       0.58      0.56      0.56       200\nweighted avg       0.73      0.76      0.75       200\n",
-          "false_negative_rate": 0.44022092267706303,
-          "roc_auc": 0,
-          "training_time": 0.704219,
+          "training_time": 0.80104,
           "model_name": "MLP",
-          "cv_mean": 0.76,
-          "cv_std": 0.02113941815660971
+          "cv_mean": 0.7124999999999999,
+          "cv_std": 0.012499999999999989
         },
         "AdaptiveKNN": {
-          "accuracy": 0.8,
-          "precision": 0.73359375,
-          "recall": 0.8,
-          "f1_score": 0.7432571849668386,
+          "accuracy": 0.76,
+          "precision": 0.6873758865248227,
+          "recall": 0.76,
+          "f1_score": 0.7025913621262458,
           "confusion_matrix": [
             [
-              3,
-              35
+              4,
+              40
             ],
             [
-              5,
-              157
+              8,
+              148
             ]
           ],
-          "classification_report": "              precision    recall  f1-score   support\n\n           5       0.38      0.08      0.13        38\n          10       0.82      0.97      0.89       162\n\n    accuracy                           0.80       200\n   macro avg       0.60      0.52      0.51       200\nweighted avg       0.73      0.80      0.74       200\n",
-          "false_negative_rate": 0.4759584145549058,
+          "classification_report": "              precision    recall  f1-score   support\n\n           5       0.33      0.09      0.14        44\n          10       0.79      0.95      0.86       156\n\n    accuracy                           0.76       200\n   macro avg       0.56      0.52      0.50       200\nweighted avg       0.69      0.76      0.70       200\n",
+          "false_negative_rate": 0.4801864801864802,
           "roc_auc": 0,
-          "training_time": 5.383123,
+          "training_time": 6.029115,
           "model_name": "AdaptiveKNN",
-          "cv_mean": 0.7226274878670074,
-          "cv_std": 0.0044887972342638255
+          "cv_mean": 0.6848631986812815,
+          "cv_std": 0.010006837884884297
         },
         "AdaptiveRandomForest": {
-          "accuracy": 0.81,
-          "precision": 0.6561,
-          "recall": 0.81,
-          "f1_score": 0.7249723756906077,
+          "accuracy": 0.78,
+          "precision": 0.6084,
+          "recall": 0.78,
+          "f1_score": 0.6835955056179777,
           "confusion_matrix": [
             [
               0,
-              38
+              44
             ],
             [
               0,
-              162
+              156
             ]
           ],
-          "classification_report": "              precision    recall  f1-score   support\n\n           5       0.00      0.00      0.00        38\n          10       0.81      1.00      0.90       162\n\n    accuracy                           0.81       200\n   macro avg       0.41      0.50      0.45       200\nweighted avg       0.66      0.81      0.72       200\n",
+          "classification_report": "              precision    recall  f1-score   support\n\n           5       0.00      0.00      0.00        44\n          10       0.78      1.00      0.88       156\n\n    accuracy                           0.78       200\n   macro avg       0.39      0.50      0.44       200\nweighted avg       0.61      0.78      0.68       200\n",
           "false_negative_rate": 0.5,
           "roc_auc": 0,
-          "training_time": 90.365646,
+          "training_time": 108.095594,
           "model_name": "AdaptiveRandomForest",
-          "cv_mean": 0.7219987670524599,
-          "cv_std": 0.004270788446634291
+          "cv_mean": 0.6800358224606458,
+          "cv_std": 0.004207148876424261
         }
       }
     },
@@ -175,12 +175,12 @@
       "predictions": {
         "RandomForest": {
           "trust_score": 10.0,
-          "confidence": 0.8679165041093044,
+          "confidence": 0.8488257848047551,
           "mfa_required": "False",
           "access_decision": "ALLOW",
-          "authentication_latency_ms": 102.0,
+          "authentication_latency_ms": 72.932,
           "model_used": "RandomForest",
-          "timestamp": "2025-07-28T21:55:23.070134",
+          "timestamp": "2025-07-28T22:43:45.572189",
           "stride_risk_level": "LOW_RISK"
         },
         "KNN": {
@@ -188,61 +188,61 @@
           "confidence": 1.0,
           "mfa_required": "False",
           "access_decision": "ALLOW",
-          "authentication_latency_ms": 9.534,
+          "authentication_latency_ms": 9.962,
           "model_used": "KNN",
-          "timestamp": "2025-07-28T21:55:23.081315",
+          "timestamp": "2025-07-28T22:43:45.583142",
           "stride_risk_level": "LOW_RISK"
         },
         "NaiveBayes": {
           "trust_score": 10.0,
-          "confidence": 0.9604104798884913,
+          "confidence": 0.8284301580979324,
           "mfa_required": "False",
           "access_decision": "ALLOW",
-          "authentication_latency_ms": 3.299,
+          "authentication_latency_ms": 3.879,
           "model_used": "NaiveBayes",
-          "timestamp": "2025-07-28T21:55:23.084742",
+          "timestamp": "2025-07-28T22:43:45.587151",
           "stride_risk_level": "LOW_RISK"
         },
         "MLP": {
           "trust_score": 10.0,
-          "confidence": 0.9999821987574944,
+          "confidence": 0.9962499947865404,
           "mfa_required": "False",
           "access_decision": "ALLOW",
-          "authentication_latency_ms": 3.076,
+          "authentication_latency_ms": 1.991,
           "model_used": "MLP",
-          "timestamp": "2025-07-28T21:55:23.088888",
+          "timestamp": "2025-07-28T22:43:45.589641",
           "stride_risk_level": "LOW_RISK"
         },
         "AdaptiveKNN": {
           "trust_score": 10.0,
-          "confidence": 1.0,
+          "confidence": 0.8571428571428571,
           "mfa_required": "False",
           "access_decision": "ALLOW",
-          "authentication_latency_ms": 2.9659999999999997,
+          "authentication_latency_ms": 1.685,
           "model_used": "AdaptiveKNN",
-          "timestamp": "2025-07-28T21:55:23.092441",
+          "timestamp": "2025-07-28T22:43:45.591704",
           "stride_risk_level": "LOW_RISK"
         },
         "AdaptiveRandomForest": {
           "trust_score": 10.0,
-          "confidence": 0.9521285121476634,
+          "confidence": 0.8521709143405254,
           "mfa_required": "False",
           "access_decision": "ALLOW",
-          "authentication_latency_ms": 21.562,
+          "authentication_latency_ms": 15.911999999999999,
           "model_used": "AdaptiveRandomForest",
-          "timestamp": "2025-07-28T21:55:23.114138",
+          "timestamp": "2025-07-28T22:43:45.607723",
           "stride_risk_level": "LOW_RISK"
         }
       },
       "prediction_times_ms": {
-        "RandomForest": 102.46491432189941,
-        "KNN": 10.919809341430664,
-        "NaiveBayes": 3.3788681030273438,
-        "MLP": 4.038333892822266,
-        "AdaptiveKNN": 3.4940242767333984,
-        "AdaptiveRandomForest": 21.64006233215332
+        "RandomForest": 73.22382926940918,
+        "KNN": 10.853052139282227,
+        "NaiveBayes": 3.9610862731933594,
+        "MLP": 2.439260482788086,
+        "AdaptiveKNN": 2.017974853515625,
+        "AdaptiveRandomForest": 15.97905158996582
       },
-      "average_prediction_time_ms": 24.322668711344402
+      "average_prediction_time_ms": 18.079042434692383
     },
     "evaluation": {
       "status": "passed",
@@ -272,7 +272,7 @@
           "auc": 0
         },
         "MLP": {
-          "error": "Labels in y_true and y_pred should be of the same type. Got y_true=['BENIGN' 'MALICIOUS'] and y_pred=[ 5 10]. Make sure that the predictions provided by the classifier coincides with the true labels.",
+          "error": "Labels in y_true and y_pred should be of the same type. Got y_true=['BENIGN' 'MALICIOUS'] and y_pred=[10]. Make sure that the predictions provided by the classifier coincides with the true labels.",
           "accuracy": 0,
           "precision": 0,
           "recall": 0,
@@ -324,14 +324,14 @@
       "status": "passed",
       "benchmark_results": {
         "RandomForest": {
-          "throughput_sessions_per_second": 11732.957878681216,
-          "average_authentication_latency_ms": 0.08523,
-          "total_processing_time_seconds": 0.08523,
+          "throughput_sessions_per_second": 16368.219465086588,
+          "average_authentication_latency_ms": 0.06109400000000001,
+          "total_processing_time_seconds": 0.061094,
           "sessions_processed": 1000,
           "predictions_sample": [
             10,
-            5,
             10,
+            5,
             10,
             10,
             10,
@@ -342,17 +342,17 @@
           ]
         },
         "KNN": {
-          "throughput_sessions_per_second": 14908.906580791367,
-          "average_authentication_latency_ms": 0.067074,
-          "total_processing_time_seconds": 0.067074,
+          "throughput_sessions_per_second": 21099.272075113407,
+          "average_authentication_latency_ms": 0.047395,
+          "total_processing_time_seconds": 0.047395,
           "sessions_processed": 1000,
           "predictions_sample": [
+            10,
             10,
             5,
             10,
             10,
-            10,
-            10,
+            5,
             10,
             10,
             10,
@@ -360,32 +360,32 @@
           ]
         },
         "NaiveBayes": {
-          "throughput_sessions_per_second": 281848.9289740699,
-          "average_authentication_latency_ms": 0.003548,
-          "total_processing_time_seconds": 0.003548,
+          "throughput_sessions_per_second": 490436.4884747425,
+          "average_authentication_latency_ms": 0.002039,
+          "total_processing_time_seconds": 0.002039,
           "sessions_processed": 1000,
           "predictions_sample": [
             10,
-            5,
-            5,
             10,
             10,
-            5,
             10,
             10,
-            5,
+            10,
+            10,
+            10,
+            10,
             10
           ]
         },
         "MLP": {
-          "throughput_sessions_per_second": 175746.9244288225,
-          "average_authentication_latency_ms": 0.00569,
-          "total_processing_time_seconds": 0.00569,
+          "throughput_sessions_per_second": 314960.6299212599,
+          "average_authentication_latency_ms": 0.003175,
+          "total_processing_time_seconds": 0.003175,
           "sessions_processed": 1000,
           "predictions_sample": [
             10,
-            5,
             10,
+            5,
             10,
             10,
             10,
@@ -396,9 +396,9 @@
           ]
         },
         "AdaptiveKNN": {
-          "throughput_sessions_per_second": 19940.974714844062,
-          "average_authentication_latency_ms": 0.050148,
-          "total_processing_time_seconds": 0.050148,
+          "throughput_sessions_per_second": 26034.20895056104,
+          "average_authentication_latency_ms": 0.038411,
+          "total_processing_time_seconds": 0.038411,
           "sessions_processed": 1000,
           "predictions_sample": [
             10,
@@ -414,13 +414,13 @@
           ]
         },
         "AdaptiveRandomForest": {
-          "throughput_sessions_per_second": 41602.529433789576,
-          "average_authentication_latency_ms": 0.024037,
-          "total_processing_time_seconds": 0.024037,
+          "throughput_sessions_per_second": 58561.724057156236,
+          "average_authentication_latency_ms": 0.017076,
+          "total_processing_time_seconds": 0.017076,
           "sessions_processed": 1000,
           "predictions_sample": [
             10,
-            5,
+            10,
             10,
             10,
             10,
